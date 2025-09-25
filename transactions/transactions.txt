@@ -1,0 +1,90 @@
+[Function: APSaveVoucher]
+
+30  : SET        	: SVViewName 		: $$SysName:InvVchView
+40 	: NEW OBJECT 	: Voucher
+70 	: SET VALUE 	: Date 				: "20250401"
+80 	: SET VALUE 	: VoucherTypeName 	: "Sales"
+90 	: SET VALUE 	: VoucherNumber		: "DP252683577"
+100 : SET VALUE 	: PartyLedgerName 	: "Cssh"
+110 : SET VALUE 	: IsInvoice 		: Yes
+120 : SET VALUE 	: Reference
+130 : SET VALUE 	: GstRegistrationType: "Unregistered/Consumer"
+140 : SET VALUE 	: BasicBuyerName 	: "Cash"
+150 : SET VALUE 	: PartyMailingName	: "Cash"
+160 : SET VALUE 	: StateName			: "Tamil Nadu"
+170	: SET VALUE 	: CountryOfResidence: "India"
+180 : SET VALUE 	: PlaceOfSupply		: "Tamil Nadu"
+
+
+190 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+	200 : SET VALUE 	: LedgerName 		: "Cash"
+	210 : SET VALUE 	: IsDeemedPositive 	: Yes
+	220 : SET VALUE 	: Amount 			: $$AsAmount:"1050" * -1
+	230 : SET TARGET 	: ..
+
+240 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+	250 : SET VALUE 	: LedgerName 		: "Output Cgst"
+	260 : SET VALUE 	: IsDeemedPositive 	: No
+	270 : SET VALUE 	: Amount 			: $$AsAmount:"25"
+	280 : SET TARGET 	: ..
+	 
+290 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+	300 : SET VALUE 	: LedgerName 		: "Output Sgst"
+	310 : SET VALUE 	: IsDeemedPositive 	: No
+	320 : SET VALUE 	: Amount 			: $$AsAmount:"25"
+	330 : SET TARGET 	: ..
+
+340 : INSERT COLLECTION OBJECT 			: INVENTORYENTRIES
+	350 : SET VALUE 	: StockItemName 	: "MOX REDIMIX 125MG SYRUP 30ML"
+	360 : SET VALUE 	: IsDeemedPositive 	: No
+	370 : SET VALUE 	: ActualQty 		: ($$TgtObject:($$AsQty:"-10"))
+	380 : SET VALUE 	: BilledQty 		: ($$TgtObject:($$AsQty:"-10"))
+	390 : SET VALUE 	: Rate 				: ($$TgtObject:($$AsRate:"100"))
+	400 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
+	410 : SET VALUE 	: GstHsnName		: "412354"
+	420 : Set Value		: GstHsnInferApplicability : "Specify Details Here"
+	430 : Set Value		: GstRateInferApplicability : "Specify Details Here"
+	440 : Set Value		: GstOvrdnTaxability : "Taxable"
+	
+;
+;	450 : INSERT COLLECTION OBJECT 			: BATCHALLOCATIONS
+;		460 : SET VALUE 	: BatchName 		: "Primary Batch"
+;		470 : SET VALUE 	: ActualQty 		: ($$TgtObject:($$AsQty:"-10"))
+;		480 : SET VALUE 	: BilledQty 		: ($$TgtObject:($$AsQty:"-10"))
+;		490 : SET VALUE 	: Rate 				: ($$TgtObject:($$AsRate:"100"))
+;		500 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
+;		510 : SET TARGET 	: ..
+
+	520 : INSERT COLLECTION OBJECT 			: ACCOUNTING ALLOCATIONS
+		530 : SET VALUE 	: LedgerName 		: "Sales"
+		540 : SET VALUE 	: IsDeemedPositive 	: No
+		550 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
+		560 : SET TARGET 	: ..
+	
+	570: Insert Collection Object: RATEDETAILS
+		580: Set Value: GSTRATEDUTYHEAD : "CGST"
+		590: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+		600: Set Value: GSTRATE: 2.50
+		610: Set Target: ..
+	620: Insert Collection Object: RATEDETAILS
+		630: Set Value: GSTRATEDUTYHEAD : "SGST/UTGST"
+		640: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+		650: Set Value: GSTRATE: 2.50
+		660: Set Target: ..	
+	670: Insert Collection Object: RATEDETAILS
+		680: Set Value: GSTRATEDUTYHEAD : "IGST"
+		690: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+		700: Set Value: GSTRATE: 5
+		710: Set Target: ..		
+	720: Insert Collection Object: RATEDETAILS
+		730: Set Value: GSTRATEDUTYHEAD : "CESS"
+		740: Set Value: GSTRATEVALUATIONTYPE : $$SysName:NotApplicable			
+		750: Set Target: ..		
+	760: Insert Collection Object: RATEDETAILS
+		770: Set Value: GSTRATEDUTYHEAD : "STATE CESS"
+		780: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+		790: Set Target: ...
+
+800 : SET VALUE   	: PersistedView 	: ##SVViewName
+810 : CREATE TARGET
+820 : Msg Box: "Success": "Voucher created"

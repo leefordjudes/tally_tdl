@@ -1,0 +1,95 @@
+[System: Formula]
+	FilterById: $APId = $$Number:#APIdField
+	FilterMapped: $APTallyName = '-'
+
+[Variable: AP Unit Map]
+	Variable: Id			: Number
+	Variable: TallyName		: String
+	
+[Collection: APUnitMapVar]
+	Data Source: Variable: APUnitMap
+			
+[Collection: TallyUnits]
+	Type: Unit
+	Title: "Tally Units"
+	Format	: $Name, 20
+
+[Report: AP Unit Map]
+	Title: "Auditplus Unit Mapping"
+	Form: AP Unit Map
+	List Variable: AP Unit Map
+	Object: Company: ##SVCurrentCompany
+		
+[Form: AP Unit Map]
+	Part: AP Unit Map Title, AP Unit Map
+	Buttons: AP Delete All Unit
+	Width: 100% Screen
+	Height: 100% Screen
+
+[Part:	Ap Unit Map Title]
+	Lines  	 	: AP Unit Map Title
+	Border  	: Column Titles
+	
+	[Line: AP Unit Map Title]	
+		Use     : AP Unit Map
+		Local   : Field : Default                   : Style : Small Bold
+		Local   : Field : Default                   : Skip  : Yes
+		Local   : Field : Default                   : Type  : String
+		Local   : Field : Default                   : Delete: Storage
+		Local   : Field : Default                   : Delete: Inactive
+
+		Local   : Field : AP Id Field               : Info: "Id"
+		Local   : Field : AP Name Field			    : Info: "Name"
+		Local   : Field : AP UQC Field		        : Info: "UQC"
+		Local   : Field : AP Tally Name Field	    : Info: "Tally Unit"	
+
+[Part: Ap Unit Map]
+	Line			: AP Unit Map
+	Repeat			: AP Unit Map:APUnits
+	Scroll			: Vertical
+	Common Border	: Yes
+	Border	:	Column Titles
+	
+	[Line: AP Unit Map]
+		Field: AP Id Field, AP Name Field, AP UQC Field, AP Tally Name Field
+		Local       : 	Field : Default   : Style : Small Bold
+			
+		[Field: AP Id Field]
+			Use: NameField
+			Border  : Thin Left
+			Info	: $APId
+			
+		[Field: AP Name Field]
+			Use: NameField		
+			Border  : Thin Left
+			Info	: $APName			
+					
+		[Field: AP UQC Field]
+			Use: NameField
+			Border  : Thin Left
+			Info	: $APUqc			
+
+		[Field: AP Tally Name Field]
+			Use: NameField
+			Border  : Thin Left
+			Storage	: APTallyName
+			Show Table: Always			
+			Table: TallyUnits			
+
+
+[Function: AP Delete ALL Unit]
+	002: Set Object: (Company, ##SVCurrentCompany).	 ; current object
+	003: Set Target
+	004: Walk Collection: APUnits 					; loops from current object
+		005: Delete Collection Object : APUnits		; works on target object
+	010: End Walk
+	020: Alter Target
+	
+[Button: AP Delete All Unit]
+	Key: F4
+	Action: Call : AP Delete ALL Unit
+	Title: "Delete All"					
+
+
+
+		

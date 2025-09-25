@@ -1,0 +1,22 @@
+[System: UDF]
+	AP Host					: 	String		: 25001
+	AP Organization			:	String		: 25002
+	AP AuthToken			: 	String		: 25003
+	
+	AP Name					:	String		: 25004
+	AP Tally Name			:	String		: 25005
+		
+	AP UQC					:	String		: 25006
+	AP Account Type			:	String		: 25007
+	AP HsnCode				: 	String		: 25008
+	AP Voucher Type			:	String		: 25009
+			
+
+	AP Id					: 	Number		: 25001
+		
+	AP Units				:	Aggregate	: 25001
+	AP Stock Items			:	Aggregate	: 25002
+	AP Ledgers				:	Aggregate	: 25003
+	AP VoucherTypes			:	Aggregate	: 25004
+	
+	

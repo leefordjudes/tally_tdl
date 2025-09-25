@@ -1,0 +1,42 @@
+[Collection: TallyStockItems]
+	Type: Stock Item
+	Title: "Tally Stock Items"
+	Format	: $Name, 20
+
+[Report: AP Stock Item Map]
+	Use: AP Unit Map
+	Title: "Auditplus Stock Item Mapping"
+		
+	Local: Form: APUnitMap: Delete: Buttons
+	Local: Form: APUnitMap: Add: Buttons: AP Delete All Stock Item
+
+	Local: Part: APUnitMap: Repeat: APUnitMap: AP Stock Items
+	
+	Local: Line: AP Unit Map Title : Delete : Field : AP Uqc Field 
+	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Info: "HSN Code"	
+	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Info: "HSN Description"
+	Local: Line: AP Unit Map Title: Local: Field : AP Tally Name Field	: Info: "Tally Stock Item"
+		
+	Local: Line: AP Unit Map : Local: Field: AP Id Field : Info: $APHsnCode
+	Local: Line: AP Unit Map : Local: Field: AP Name Field : Info: $APName
+	Local: Line: AP Unit Map : Delete : Field : AP Uqc Field 
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyStockItems
+
+[Collection: APStockItems]
+	Type: APStockItems:Company
+	Filter		: NOT FilterMapped
+
+[Function: AP Delete ALL Stock Item]
+	002: Set Object: (Company, ##SVCurrentCompany).	 
+	003: Set Target
+	004: Walk Collection: APStockItems 				
+		005: Delete Collection Object : APStockItems		
+	010: End Walk
+	020: Alter Target	
+
+[Button: AP Delete All Stock Item]
+	Key: F4
+	Action: Call : AP Delete ALL Stock Item
+	Title: "Delete All"		
+

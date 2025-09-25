@@ -1,0 +1,51 @@
+[Report: AP Configuration]
+	Title: Auditplus Configuration
+	Form: AP Configuration
+	Object	:	Company	:	##SVCurrentCompany
+	
+[Form: AP Configuration]	
+	Parts: Form SubTitle, AP Configuration Body	
+	FullWidth   : No
+	Space Left	: 2
+	Space Right	: 2
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Configuration"
+	
+[Part: AP Configuration Body]
+	Lines:	AP Host, AP Organization, AP AuthToken
+	
+	[Line: AP Host]
+		Fields: Medium Prompt, AP Host
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "Host"
+		
+		[Field: AP Host]
+			Width	: 30
+			Max		: 250
+			Storage	: APHost
+			Style   : Normal Bold
+			Case    : Lower Case
+			
+
+	[Line: AP Organization]
+		Fields: Medium Prompt, AP Organization
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "Organization"
+		
+		[Field: AP Organization]
+			Width	: 30
+			Max		: 250
+			Storage	: APOrganization
+			Style   : Normal Bold
+			Case    : Lower Case
+	
+	[Line: AP AuthToken]
+		Fields: Medium Prompt, AP AuthToken
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "AuthToken"
+		
+		[Field: AP AuthToken]
+			Width	: 30
+			Max		: 250
+			Storage	: APAuthToken
+		
+

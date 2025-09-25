@@ -1,0 +1,42 @@
+[Collection: TallyLedgers]
+	Type: Ledger
+	Title: "Tally Ledgers"
+	Format	: $Name, 20
+	
+[Report: AP Ledger Map]
+	Use: AP Unit Map
+	Title: "Auditplus Ledger Mapping"
+	
+	Local: Form: APUnitMap: Delete: Buttons
+	Local: Form: APUnitMap: Add: Buttons: AP Delete All Ledger
+	
+	Local: Part: APUnitMap: Repeat: APUnitMap: AP Ledgers
+	
+	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Info: "Id"	
+	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Info: "Name"
+	Local: Line: AP Unit Map Title: Local: Field : AP Uqc Field			: Info: "Account Type"
+	Local: Line: AP Unit Map Title: Local: Field : AP Tally Name Field	: Info: "Tally Ledger"
+		
+	Local: Line: AP Unit Map : Local: Field: AP Id Field 		: Info: $APId
+	Local: Line: AP Unit Map : Local: Field: AP Name Field 		: Info: $APName
+	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 		: Info: $APAccountType
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyLedgers
+
+
+[Collection: APLedgers]
+	Type	: APLedgers:Company
+	Filter	: NOT FilterMapped
+
+[Function: AP Delete ALL Ledger]
+	010: Set Object: (Company, ##SVCurrentCompany).	 
+	020: Set Target
+	030: Walk Collection: APLedgers
+		040: Delete Collection Object : APLedgers
+	050: End Walk
+	060: Alter Target	
+	
+[Button: AP Delete All Ledger]
+	Key: F4
+	Action: Call : AP Delete ALL Ledger
+	Title: "Delete All"	

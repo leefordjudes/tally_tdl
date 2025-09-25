@@ -1,0 +1,75 @@
+[#Menu: Gateway of Tally]	
+	
+	Add	: Key Item	: After: @@locIndentUtilities :	"Auditplus Integration" : U	: Menu	: AuditplusIntegration
+	
+
+[Menu: Auditplus Integration]
+	
+	Key Item: "Masters"			: M : Menu	:	AP Masters
+	Key Item: "Transactions"	: T : Call	:	AP SaveVoucher
+	Key Item: "Configuration"	: C : Alter	:	AP Configuration 
+
+
+[System: Formula]
+	APHost			: $ApHost:Company:##SVCurrentCompany
+	APOrganization	: $ApOrganization:Company:##SVCurrentCompany	
+	APAuthToken		: $ApAuthToken:Company:##SVCurrentCompany	
+	
+
+[Include: udf.txt]
+[Include: configuration/configuration.txt]
+[Include: masters/masters.txt]
+[Include: transactions/transactions.txt]
+
+
+[Collection: Rpc Data Source]
+	;Local Formula	: Host	:	@@APHost + "/rest/rpc"
+	Data Source		: HTTP JSON: @@APHost: UTF8
+	RemoteRequest	: Rpc Request: UTF8
+	Export Header	: "organization:" + @@APOrganization
+	Export Header	: "auth_token:" + @@APAuthToken
+
+;;----------------------------RPC Request Start---------------------	
+
+[Report: Rpc Request]
+	Form: Rpc Request
+	Plain JSON: Yes
+	
+[Form: Rpc Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: Rpc Request Method, Rpc Request Data
+	
+
+[Part: Rpc Request Method]
+	Line: Rpc Request Method
+	Scroll: Vertical
+	
+	[Line: Rpc Request Method]
+		Field: Rpc Request Method
+			
+			[Field: Rpc Request Method]
+				Use: Name Field
+				JSONTag: "method"
+				Set as: "ping"
+				
+[Part: Rpc Request Data]
+	Part: Rpc Request Filter
+	JSONTag: "data"
+	Scroll: Vertical
+
+[Part: Rpc Request Filter]
+	Line: Rpc Request Filter
+	JSONTag: "filter"
+	Scroll: Vertical
+	
+	[Line: Rpc Request Filter]
+		Field: Rpc Request Filter
+			
+			[Field: Rpc Request Filter]
+				Use: Name Field
+				JSONTag: ""
+				Set as: ""
+				
+;;----------------------------RPC Request End---------------------	

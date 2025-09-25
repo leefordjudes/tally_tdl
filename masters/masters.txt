@@ -1,0 +1,24 @@
+[Menu: AP Masters]
+	Title	: "Masters (Auditplus To Tally)"
+	Key Item: "Download"		: D : Call		:	AP Download Masters
+	Item: Blank	
+	
+	Indent	: "Mappings"
+	Key Item: "Ledger"			: L : Alter		:	AP Ledger Map
+	Key Item: "Stock Item"		: S : Alter		:	AP Stock Item Map
+	Key Item: "Unit"			: U : Alter		:	AP Unit Map	
+	Key Item: "VoucherType"		: V : Alter		:	AP VoucherType Map
+	Item: Blank
+
+	Indent	: "Reports"
+	Key Item: "Ledger"			: D : Display	:	AP Ledger Map	
+	Key Item: "Stock Item"		: O : Display	:	AP Stock Item Map
+	Key Item: "Unit"			: I : Display	:	AP Unit Map
+	Key Item: "Voucher Type"	: T : Display	:	AP VoucherType Map
+	
+
+[Include: unit.txt]
+[Include: stock_item.txt]
+[Include: ledger.txt]
+[Include: voucher_type.txt]
+[Include: download.txt]
