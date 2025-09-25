@@ -1,90 +1,295 @@
+[System: Formula]
+	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName
+	
+[Collection: APVoucherTypesMapped]
+	Type	: APVoucherTypes:Company
+	Filter	: VchTypeMappedFlt
+
+[Report: AP Tally Export Voucher Request]
+	Use: Rpc Request
+	
+	Local: Part: Rpc Request Data: Delete: Part: Rpc Request Filter
+	Local: Part: Rpc Request Data: Add: Part: Export Voucher Request
+	
+	Local: Field: Rpc Request Method: Set as: "tally_export_voucher"
+	
+[Part: Export Voucher Request]
+	Line: Export Voucher Request
+	Scroll: Vertical
+	
+	[Line: Export Voucher Request]
+		Fields: ExportVoucherRequest From Date, ExportVoucherRequest To Date, ExportVoucherRequest Voucher Type Id
+			
+			[Field: ExportVoucherRequest From Date]
+				Type: String
+				JSONTag: "from_date"
+				Set as: "2025-09-20"
+			[Field: ExportVoucherRequest To Date]
+				Type: String
+				JSONTag: "to_date"
+				Set as: "2025-09-20"	
+			[Field: ExportVoucherRequest Voucher Type Id]
+				Type: Number
+				JSONTag: "voucher_type_id"
+				Set as: ##VTypeIdVar
+
+[Collection: AP Tally Export Voucher Data Source]
+	Use				: Rpc Data Source
+	RemoteRequest	: AP Tally Export Voucher Request: UTF8
+
+
 [Function: APSaveVoucher]
-
-30  : SET        	: SVViewName 		: $$SysName:InvVchView
-40 	: NEW OBJECT 	: Voucher
-70 	: SET VALUE 	: Date 				: "20250401"
-80 	: SET VALUE 	: VoucherTypeName 	: "Sales"
-90 	: SET VALUE 	: VoucherNumber		: "DP252683577"
-100 : SET VALUE 	: PartyLedgerName 	: "Cssh"
-110 : SET VALUE 	: IsInvoice 		: Yes
-120 : SET VALUE 	: Reference
-130 : SET VALUE 	: GstRegistrationType: "Unregistered/Consumer"
-140 : SET VALUE 	: BasicBuyerName 	: "Cash"
-150 : SET VALUE 	: PartyMailingName	: "Cash"
-160 : SET VALUE 	: StateName			: "Tamil Nadu"
-170	: SET VALUE 	: CountryOfResidence: "India"
-180 : SET VALUE 	: PlaceOfSupply		: "Tamil Nadu"
-
-
-190 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
-	200 : SET VALUE 	: LedgerName 		: "Cash"
-	210 : SET VALUE 	: IsDeemedPositive 	: Yes
-	220 : SET VALUE 	: Amount 			: $$AsAmount:"1050" * -1
-	230 : SET TARGET 	: ..
-
-240 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
-	250 : SET VALUE 	: LedgerName 		: "Output Cgst"
-	260 : SET VALUE 	: IsDeemedPositive 	: No
-	270 : SET VALUE 	: Amount 			: $$AsAmount:"25"
-	280 : SET TARGET 	: ..
-	 
-290 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
-	300 : SET VALUE 	: LedgerName 		: "Output Sgst"
-	310 : SET VALUE 	: IsDeemedPositive 	: No
-	320 : SET VALUE 	: Amount 			: $$AsAmount:"25"
-	330 : SET TARGET 	: ..
-
-340 : INSERT COLLECTION OBJECT 			: INVENTORYENTRIES
-	350 : SET VALUE 	: StockItemName 	: "MOX REDIMIX 125MG SYRUP 30ML"
-	360 : SET VALUE 	: IsDeemedPositive 	: No
-	370 : SET VALUE 	: ActualQty 		: ($$TgtObject:($$AsQty:"-10"))
-	380 : SET VALUE 	: BilledQty 		: ($$TgtObject:($$AsQty:"-10"))
-	390 : SET VALUE 	: Rate 				: ($$TgtObject:($$AsRate:"100"))
-	400 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
-	410 : SET VALUE 	: GstHsnName		: "412354"
-	420 : Set Value		: GstHsnInferApplicability : "Specify Details Here"
-	430 : Set Value		: GstRateInferApplicability : "Specify Details Here"
-	440 : Set Value		: GstOvrdnTaxability : "Taxable"
+	Local Formula: FromDate: "2025-09-20"
+	Local Formula: ToDate: "2025-09-20"
+	Variable: VTypeIdVar: Number
+	Variable: VTypeNameVar: String
 	
+	LIST VARIABLE 	: Ledger Map List 	: String
+	
+;	Local Formula: lstfnd: ##LedgerMapList[$$ListIndex:LedgerMapList:$account_id]
+	
+
+000: Set Object: (Company, ##SVCurrentCompany).	 
+80a: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
+001: Walk Collection: APVoucherTypesMapped
+	sdwe: Set: VTypeIdVar	: $APId
+	sdw1: Set: VTypeNameVar	: $APTallyName
+	asf: Walk Collection: AP Tally Export Voucher Data Source
+		98: Walk Collection: data
+			s3: Msg Box: $id : $voucher_no			
+			a9: call : APSaveEachVoucher
+		32: End Walk
+	aw3: End Walk
+003: End Walk
+
+[Function: GetPartyLedgerName]
+		Parameter: RegType: String
+		Variable: Out: String
+		Returns: String
+		
+
+	1: If: ##RegType = "a"
+	s1:  Set: Out: "Regular"
+	1a: Else:  
+	ad:  Set: Out: "Unregistered/Consumer"
+	2: End If
+	3: Return: Out
+
+[Variable: AP Master Map]
+	Variable: Id			: Number
+	Variable: TallyName		: String
+
+[Function: APSaveEachVoucher]
+	Variable: IdVar				:	Number
+	Variable: TallyNameVar		:	String
+	Variable: MapItemTypeVar 	: 	String
+	Variable: ListIdxVar		: 	Number
+
+	
+	Local Formula: GetPartyLedgerName: $$GetPartyLedgerName:"sdsdd"
+	Local Formula: Lc: $$ListCount:LedgerMapList
+		
+	
+	100 : SET        	: SVViewName 		: $$SysName:InvVchView
+	200	: NEW OBJECT 	: Voucher
+	300	: SET VALUE 	: Date 				: "20250401"	
+	400	: SET VALUE 	: VoucherTypeName 	: ##VTypeNameVar
+	500	: SET VALUE 	: VoucherNumber		: $voucher_no
+	600 : SET VALUE 	: PartyLedgerName 	: "Cash"
+	700 : SET VALUE 	: IsInvoice 		: Yes
+	800 : SET VALUE 	: Reference			: "$ref_no"
+	900 : SET VALUE 	: GstRegistrationType: "Unregistered/Consumer" ;@GetPartyLedgerName
+	1000 : SET VALUE 	: BasicBuyerName 	: "Cash"
+	1100 : SET VALUE 	: PartyMailingName	: "Cash"
+	1200 : SET VALUE 	: StateName			: "Tamil Nadu"
+	1300 : SET VALUE 	: CountryOfResidence: "India"
+	1400 : SET VALUE 	: PlaceOfSupply		: "Tamil Nadu"
+	1600 : Walk Collection: ac_trns
+		1601: Set: IdVar: $account_id  	
+		1601a: Set: ListIdxVar: $$ListIndex:LedgerMapList:##IdVar
+		1602: Set: TallyNameVar: ##LedgerMapList[##ListIdxVar]  		
+		1603: If: $$IsEmpty:##TallyNameVar 
+			1604: Set: MapItemTypeVar : "Ledger"
+			1605: Alter: AP Map Tally Name
+			1606: If: Not $$IsEmpty:##TallyNameVar
+;				1607: Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=##IdVar].APTallyName : ##TallyNameVar
+;				1607a: Set target : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=##IdVar]
+;				1607b: Set Value: APTallyName : ##TallyNameVar
+;				1607C: Alter Target
+;				1607d: Set Target: ..
+				
+				1608: Set: LedgerMapList[##ListIdxVar]: ##TallyNameVar
+			;;1609: Else: return
+			1610: End if
+		1650: End If
+;		1651: Msg Box: "y":##TallyNameVar
+		1800 : INSERT COLLECTION OBJECT 		: LEDGERENTRIES
+		1900 : SET VALUE 	: LedgerName 		: ##TallyNameVar
+		2000 : SET VALUE 	: IsDeemedPositive 	: if $amount > 0 then Yes else No
+		2100 : SET VALUE 	: Amount 			: $$AsAmount:$amount * -1
+		2200 : SET TARGET 	: ..		
+;		2201: Msg Box: "z":"z"
+	2300: End Walk
+	
+;	190 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+;		200 : SET VALUE 	: LedgerName 		: "Cash"
+;		210 : SET VALUE 	: IsDeemedPositive 	: Yes
+;		220 : SET VALUE 	: Amount 			: $$AsAmount:"1050" * -1
+;		230 : SET TARGET 	: ..
 ;
-;	450 : INSERT COLLECTION OBJECT 			: BATCHALLOCATIONS
-;		460 : SET VALUE 	: BatchName 		: "Primary Batch"
-;		470 : SET VALUE 	: ActualQty 		: ($$TgtObject:($$AsQty:"-10"))
-;		480 : SET VALUE 	: BilledQty 		: ($$TgtObject:($$AsQty:"-10"))
-;		490 : SET VALUE 	: Rate 				: ($$TgtObject:($$AsRate:"100"))
-;		500 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
-;		510 : SET TARGET 	: ..
+;	240 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+;		250 : SET VALUE 	: LedgerName 		: "Output Cgst"
+;		260 : SET VALUE 	: IsDeemedPositive 	: No
+;		270 : SET VALUE 	: Amount 			: $$AsAmount:"25"
+;		280 : SET TARGET 	: ..
+;		 
+;	290 : INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+;		300 : SET VALUE 	: LedgerName 		: "Output Sgst"
+;		310 : SET VALUE 	: IsDeemedPositive 	: No
+;		320 : SET VALUE 	: Amount 			: $$AsAmount:"25"
+;		330 : SET TARGET 	: ..
 
-	520 : INSERT COLLECTION OBJECT 			: ACCOUNTING ALLOCATIONS
-		530 : SET VALUE 	: LedgerName 		: "Sales"
-		540 : SET VALUE 	: IsDeemedPositive 	: No
-		550 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
-		560 : SET TARGET 	: ..
+;	2400 : INSERT COLLECTION OBJECT 			: INVENTORYENTRIES
+;		2500 : SET VALUE 	: StockItemName 	: "MOX REDIMIX 125MG SYRUP 30ML"
+;		2600 : SET VALUE 	: IsDeemedPositive 	: No
+;		2700 : SET VALUE 	: ActualQty 		: ($$TgtObject:($$AsQty:"-10"))
+;		2800 : SET VALUE 	: BilledQty 		: ($$TgtObject:($$AsQty:"-10"))
+;		2900 : SET VALUE 	: Rate 				: ($$TgtObject:($$AsRate:"100"))
+;		3000 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
+;		3100 : SET VALUE 	: GstHsnName		: "412354"
+;		3200 : Set Value		: GstHsnInferApplicability : "Specify Details Here"
+;		3300 : Set Value		: GstRateInferApplicability : "Specify Details Here"
+;		3400 : Set Value		: GstOvrdnTaxability : "Taxable"		
+;
+;		3500 : INSERT COLLECTION OBJECT 			: ACCOUNTING ALLOCATIONS
+;			3600 : SET VALUE 	: LedgerName 		: "Sales"
+;			3700 : SET VALUE 	: IsDeemedPositive 	: No
+;			3800 : SET VALUE 	: Amount 			: $$AsAmount:"1000"
+;			3900 : SET TARGET 	: ..
+;		
+;		4000: Insert Collection Object: RATEDETAILS
+;			4100: Set Value: GSTRATEDUTYHEAD : "CGST"
+;			4200: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+;			4300: Set Value: GSTRATE: 2.50
+;			4400: Set Target: ..
+;		4500: Insert Collection Object: RATEDETAILS
+;			4600: Set Value: GSTRATEDUTYHEAD : "SGST/UTGST"
+;			4700: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+;			4800: Set Value: GSTRATE: 2.50
+;			4900: Set Target: ..	
+;		5000: Insert Collection Object: RATEDETAILS
+;			5100: Set Value: GSTRATEDUTYHEAD : "IGST"
+;			5200: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+;			5300: Set Value: GSTRATE: 5
+;			5400: Set Target: ..		
+;		720: Insert Collection Object: RATEDETAILS
+;			730: Set Value: GSTRATEDUTYHEAD : "CESS"
+;			740: Set Value: GSTRATEVALUATIONTYPE : $$SysName:NotApplicable			
+;			750: Set Target: ..		
+;		760: Insert Collection Object: RATEDETAILS
+;			770: Set Value: GSTRATEDUTYHEAD : "STATE CESS"
+;			780: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+;			790: Set Target: ...
+
+	800 : SET VALUE   	: PersistedView 	: ##SVViewName
+	810 : CREATE TARGET
 	
-	570: Insert Collection Object: RATEDETAILS
-		580: Set Value: GSTRATEDUTYHEAD : "CGST"
-		590: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-		600: Set Value: GSTRATE: 2.50
-		610: Set Target: ..
-	620: Insert Collection Object: RATEDETAILS
-		630: Set Value: GSTRATEDUTYHEAD : "SGST/UTGST"
-		640: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-		650: Set Value: GSTRATE: 2.50
-		660: Set Target: ..	
-	670: Insert Collection Object: RATEDETAILS
-		680: Set Value: GSTRATEDUTYHEAD : "IGST"
-		690: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-		700: Set Value: GSTRATE: 5
-		710: Set Target: ..		
-	720: Insert Collection Object: RATEDETAILS
-		730: Set Value: GSTRATEDUTYHEAD : "CESS"
-		740: Set Value: GSTRATEVALUATIONTYPE : $$SysName:NotApplicable			
-		750: Set Target: ..		
-	760: Insert Collection Object: RATEDETAILS
-		770: Set Value: GSTRATEDUTYHEAD : "STATE CESS"
-		780: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-		790: Set Target: ...
 
-800 : SET VALUE   	: PersistedView 	: ##SVViewName
-810 : CREATE TARGET
-820 : Msg Box: "Success": "Voucher created"
+[Report: AP Map Tally Name]
+	Form: AP Map Tally Name
+	
+[Form: Ap Map Tally Name]
+	Parts: Form SubTitle, AP Map Info
+	No Confirm	: Yes
+	FullWidth   : No
+	Space Left	: 2
+	Space Right	: 2
+	On: Form Accept: Yes: Set: TallyNameVar:#APMapTallyName
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Map Information for " + ##MapItemTypeVar
+
+[Part: AP Map Info]
+	Option: AP Map Ledger Info 		: ##MapItemTypeVar = "Ledger"
+	Option: AP Map Stock Item Info 	: ##MapItemTypeVar = "StockItem"
+	
+[!Part: AP Map Ledger Info]
+	Use: Ap Map Info 1
+	
+[!Part: AP Map Stock Item Info]
+	Use: Ap Map Info 1
+	
+	Local: Line: AP Map Info Line 1 : Local	:	Field	:	Medium Prompt	: Info		: "Hsn Code"
+	Local: Line: AP Map Info Line 1 : Local	:	Field	:	Name Field		: Info		: $(Company, ##SVCurrentCompany).ApStockItems[1, $APId=##IdVar].APHsnCode
+	Local: Line: AP Map Info Line 2 : Local	:	Field	:	Medium Prompt	: Info		: "Description"
+	Local: Line: AP Map Info Line 2 : Local	:	Field	:	Name Field		: Info		: $(Company, ##SVCurrentCompany).ApStockItems[1, $APId=##IdVar].APName
+	
+[Part: Ap Map Info1]
+	Lines: Ap Map Info Line 1, Ap Map Info Line 2, AP Map Info Line3
+		
+	[Line: AP Map Info Line 1]
+		Fields: Medium Prompt, Name Field
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "Ledger Name"
+		Local	:	Field	:	Name Field		: Info		: $(Company, ##SVCurrentCompany).ApLedgers[1, $APId=##IdVar].APName
+		
+			
+	[Line: AP Map Info Line 2]
+		Fields: Medium Prompt, Name Field
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "Ledger Type"
+		Local	:	Field	:	Name Field 		: Info		: $(Company, ##SVCurrentCompany).ApLedgers[1, $APId=##IdVar].APAccountType
+		
+	[Line: AP Map Info Line 3]
+		Fields: Medium Prompt, Ap Map Tally Name
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "Tally Name"
+		
+		
+		[Field: AP Map Tally Name]
+			Use: NameField 			
+			Option: AP Map Tally Ledger Name : ##MapItemTypeVar = "Ledger"
+			Option: AP Map Tally Unit Name : ##MapItemTypeVar = "Unit"
+			Option: AP Map Tally StockItem Name : ##MapItemTypeVar = "StockItem"
+			
+			
+		[!Field: AP Map Tally Ledger Name]
+			Use: NameField
+			Table: TallyLedgers,NotApplicable
+			Show Table: Always
+			
+		[!Field: AP Map Tally Unit Name]
+			Use: NameField
+			Table: TallyUnits,NotApplicable
+			Show Table: Always
+			
+		[!Field: AP Map Tally Stock Item Name]
+			Use: NameField
+			Table: TallyStockItems,NotApplicable
+			Show Table: Always
+	
+	
+		
+			
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	

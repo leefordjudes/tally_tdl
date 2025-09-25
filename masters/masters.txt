@@ -11,9 +11,9 @@
 	Item: Blank
 
 	Indent	: "Reports"
-	Key Item: "Ledger"			: D : Display	:	AP Ledger Map	
-	Key Item: "Stock Item"		: O : Display	:	AP Stock Item Map
-	Key Item: "Unit"			: I : Display	:	AP Unit Map
+	Key Item: "Ledger"			: E : Display	:	AP Ledger Map	
+	Key Item: "Stock Item"		: I : Display	:	AP Stock Item Map
+	Key Item: "Unit"			: N : Display	:	AP Unit Map
 	Key Item: "Voucher Type"	: T : Display	:	AP VoucherType Map
 	
 

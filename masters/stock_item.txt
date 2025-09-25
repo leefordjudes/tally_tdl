@@ -21,7 +21,7 @@
 	Local: Line: AP Unit Map : Local: Field: AP Name Field : Info: $APName
 	Local: Line: AP Unit Map : Delete : Field : AP Uqc Field 
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
-	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyStockItems
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyStockItems,NotApplicable
 
 [Collection: APStockItems]
 	Type: APStockItems:Company

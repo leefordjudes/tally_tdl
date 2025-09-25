@@ -1,15 +1,3 @@
-
-[Function: AP Download Masters ]
-	010 : Query Box: "Do you want to download masters" : Yes: No
-	020	: 	If	: $$LastResult	
-		030: Call: AP Download All
-;		030: Call: AP Download Ledger
-;		040: Call: AP Download Stock Item
-;		050: Call: AP Download Unit
-;		060: Call: AP Download Voucher Type
-	070	:	End If
-
-;; download ledgers
 [Report: AP Tally Export Master Request]
 	Use: Rpc Request
 	Local: Field: Rpc Request Method: Set as: "tally_export_master"
@@ -18,125 +6,64 @@
 	Use				: Rpc Data Source
 	RemoteRequest	: AP Tally Export Master Request: UTF8
 	JSON Object Path: "data:1"
-;	Keep Source		: Yes
+	
+[Function: AP Download Masters ]
+	VARIABLE	: ProgressCount		: Number
+	
+	010 : Query Box: "Do you want to download masters" : Yes: No
+	020	: 	If	: $$LastResult			
+		021: START PROGRESS	: 4:"Downloading":"Masters"
+		030: Walk Collection: AP Tally Export Master Data Source 
+			040: SET TARGET	: (Company, ##SVCurrentCompany).
+			041: SET		: ProgressCount		: 1
+			050: Walk Collection: accounts
+				060: INSERT COLLECTION OBJECT   : APLedgers
+				070: SET VALUE  : APId   		: $id
+				080: SET VALUE  : APName 		: $name
+				090: SET VALUE  : APAccountType	: $account_type_name
+				100: SET VALUE  : APTallyName  	: "-"
+				110: Set Target: .. 				
+			120: End Walk			
+			121: SHOW PROGRESS	: ##ProgressCount
+			122: INCREMENT		: ProgressCount
+			140: Walk Collection: hsns
+				150: INSERT COLLECTION OBJECT   : APStockItems
+				160: SET VALUE  : APHsnCode 	: $hsn_code
+				170: SET VALUE  : APName		: $narration
+				180: SET VALUE  : APTallyName  	: "-"
+				190: Set Target: .. 			
+			200: End Walk	
+			201: SHOW PROGRESS	: ##ProgressCount
+			202: INCREMENT		: ProgressCount
+			220: Walk Collection: units
+				230: INSERT COLLECTION OBJECT   : APUnits
+				240: SET VALUE  : APId   : $id
+				250: SET VALUE  : APName : $name
+				260: SET VALUE  : APUqc  : $uqc	
+				270: SET VALUE  : APTallyName  : "-"
+				280: Set Target: .. 
+			290: End Walk	
+			291: SHOW PROGRESS	: ##ProgressCount
+			292: INCREMENT		: ProgressCount			
+			320: Walk Collection: voucher_types
+				330: INSERT COLLECTION OBJECT   : APVoucherTypes
+				340: SET VALUE  : APId   		: $id
+				350: SET VALUE  : APName 		: $name
+				360: SET VALUE  : APVoucherType	: $base_type
+				370: SET VALUE  : APTallyName  	: "-"
+				380: Set Target: .. 			
+			390: End Walk	
+			391: SHOW PROGRESS	: ##ProgressCount
+			392: INCREMENT		: ProgressCount			
+			400: Alter Target
+			401: END PROGRESS
+		410: End Walk
+	420	:	End If
+
+
+
 		
-[Function: AP Download All]
-	001: Msg Box: "dwn":"all"
-	010: Walk Collection: AP Tally Export Master Data Source 
-		020: SET TARGET	: (Company, ##SVCurrentCompany).		
-		021: Msg Box: "accounts":"accounts"
-		030: Walk Collection: accounts
-			040: INSERT COLLECTION OBJECT   : APLedgers
-			050: SET VALUE  : APId   		: $id
-			060: SET VALUE  : APName 		: $name
-			070: SET VALUE  : APAccountType	: $account_type_name
-			080: SET VALUE  : APTallyName  	: "-"
-			090: Set Target: .. 			
-		100: End Walk				
-		110: Alter Target
-		111: Msg Box: "hsns":"hsns"
-		120: Walk Collection: hsns
-			130: INSERT COLLECTION OBJECT   : APStockItems
-			140: SET VALUE  : APHsnCode 	: $hsn_code
-			150: SET VALUE  : APName		: $narration
-			160: SET VALUE  : APTallyName  	: "-"
-			170: Set Target: .. 			
-		180: End Walk				
-		190: Alter Target
-		191: Msg Box: "units":"units"
-		200: Walk Collection: units
-			201: Msg Box: "units":$name
-			210: INSERT COLLECTION OBJECT   : APUnits
-			220: SET VALUE  : APId   : $id
-			230: SET VALUE  : APName : $name
-			240: SET VALUE  : APUqc  : $uqc	
-			250: SET VALUE  : APTallyName  : "-"
-			260: Set Target: .. 
-		270: End Walk				
-		280: Alter Target
-		281: Msg Box: "vt":"vt"
-		290: Walk Collection: voucher_types
-			291: Msg Box: "voucher_types":$name
-			300: INSERT COLLECTION OBJECT   : APVoucherTypes
-			310: SET VALUE  : APId   		: $id
-			320: SET VALUE  : APName 		: $name
-			330: SET VALUE  : APVoucherType	: $base_type
-			340: SET VALUE  : APTallyName  	: "-"
-			350: Set Target: .. 			
-		360: End Walk				
-		370: Alter Target
-	380: End Walk
 
-
-;; download stock items
-[Report: Stock Item List Request]
-	Use: Rpc Request
-	Local: Field: Rpc Request Method: Set as: "list_inventory"
-	
-[Collection: Stock Item Data Source]
-	Use				: Rpc Data Source
-	RemoteRequest	: Stock Item List Request: UTF8		
-
-[Function: AP Download Stock Item]
-	101: Walk Collection: Stock Item Data Source
-		202: SET TARGET	: (Company, ##SVCurrentCompany).	
-		203: Walk Collection: data
-			301: INSERT COLLECTION OBJECT   : APStockItems
-			302: SET VALUE  : APId   		: $id
-			303: SET VALUE  : APName 		: $name
-			304: SET VALUE  : APHsnCode		: $hsn_code
-			305:SET VALUE  : APTallyName  	: "-"
-			306: Set Target: .. 			
-		401: End Walk				
-		402: Alter Target
-	500: End Walk
-
-;; download units
-[Report: Unit List Request]
-	Use: Rpc Request
-	Local: Field: Rpc Request Method: Set as: "list_unit"
-
-[Collection: Unit Data Source]
-	Use				: Rpc Data Source
-	RemoteRequest	: Unit List Request: UTF8
-	
-[Function: AP Download Unit]
-	101: Walk Collection: Unit Data Source
-		202: SET TARGET	: (Company, ##SVCurrentCompany).	
-		203: Walk Collection: data
-			301: INSERT COLLECTION OBJECT   : APUnits
-			302: SET VALUE  : APId   : $id
-			303: SET VALUE  : APName : $name
-			304: SET VALUE  : APUqc  : $uqc	
-			305: SET VALUE  : APTallyName  : "-"
-			306: Set Target: .. 
-		401: End Walk				
-		405: Alter Target
-	500: End Walk
-
-;; download voucher types
-[Report: Voucher Type List Request]
-	Use: Rpc Request
-	Local: Field: Rpc Request Method: Set as: "list_voucher_type"
-	
-[Collection: Voucher Type Data Source]
-	Use				: Rpc Data Source
-	RemoteRequest	: Voucher Type List Request: UTF8
-
-[Function: AP Download Voucher Type]
-	020: Walk Collection: Voucher Type Data Source
-		040: SET TARGET	: (Company, ##SVCurrentCompany).	
-		050: Walk Collection: data
-			060: INSERT COLLECTION OBJECT   : APVoucherTypes
-			070: SET VALUE  : APId   		: $id
-			080: SET VALUE  : APName 		: $name
-			090: SET VALUE  : APVoucherType	: $base_type
-			100: SET VALUE  : APTallyName  	: "-"
-			110: Set Target: .. 			
-		120: End Walk				
-		130: Alter Target
-	140: End Walk
-	
 
 
 

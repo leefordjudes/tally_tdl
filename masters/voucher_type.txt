@@ -21,12 +21,11 @@
 	Local: Line: AP Unit Map : Local: Field: AP Name Field 			: Info: $APName
 	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 			: Info: $APVoucherType
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field 	: Delete: Table
-	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field 	: Table: TallyVoucherTypes
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field 	: Table: TallyVoucherTypes, NotApplicable
 
 
 [Collection: APVoucherTypes]
 	Type	: APVoucherTypes:Company
-	Filter	: NOT FilterMapped
 
 [Function: AP Delete ALL Voucher Type]
 	010: Set Object: (Company, ##SVCurrentCompany).	 
