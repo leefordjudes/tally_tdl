@@ -21,7 +21,8 @@
 	Local: Line: AP Unit Map : Local: Field: AP Name Field 		: Info: $APName
 	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 		: Info: $APAccountType
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
-	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyLedgers,NotApplicable
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyLedgers, NotApplicable
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Add: Key: Create Ledger
 
 
 [Collection: APLedgers]

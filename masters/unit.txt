@@ -63,11 +63,14 @@
 			Use: NameField		
 			Border  : Thin Left
 			Info	: $APName			
+			Width	: 50
+			
 					
 		[Field: AP UQC Field]
 			Use: NameField
 			Border  : Thin Left
 			Info	: $APUqc			
+			Width	: 50
 
 		[Field: AP Tally Name Field]
 			Use: NameField
