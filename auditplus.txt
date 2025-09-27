@@ -5,9 +5,10 @@
 
 [Menu: Auditplus Integration]
 	
-	Key Item: "Masters"			: M : Menu	:	AP Masters
-	Key Item: "Transactions"	: T : Call	:	AP SaveVoucher
-	Key Item: "Configuration"	: C : Alter	:	AP Configuration 
+	Key Item: "Masters"				: M : Menu	:	AP Masters
+	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
+	Key Item: "Txn Configuration"	: X : Alter	:	AP Txn Configuration
+	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
 
 
 [System: Formula]
@@ -19,6 +20,7 @@
 [Include: udf.txt]
 [Include: configuration/configuration.txt]
 [Include: masters/masters.txt]
+[Include: transactions/transaction_configuration.txt]
 [Include: transactions/transactions.txt]
 
 

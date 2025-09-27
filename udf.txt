@@ -10,9 +10,16 @@
 	AP Account Type			:	String		: 25007
 	AP HsnCode				: 	String		: 25008
 	AP Voucher Type			:	String		: 25009
-			
+	
+	AP Txn Voucher Type		: 	String		: 25010
+	
+	
+	AP Txn From Date		: 	Date		: 25001
+	AP Txn To Date			: 	Date		: 25002
+				
 
 	AP Id					: 	Number		: 25001
+	
 		
 	AP Units				:	Aggregate	: 25001
 	AP Stock Items			:	Aggregate	: 25002

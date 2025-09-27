@@ -55,6 +55,7 @@
 					150: INSERT COLLECTION OBJECT   : APStockItems
 					160: SET VALUE  : APHsnCode 	: $hsn_code
 					170: SET VALUE  : APName		: $name
+;					180: SET VALUE  : APTallyName	: "MOX REDIMIX 125MG SYRUP 30ML"
 					180: RESET VALUE  : APTallyName  ;; 	: $$SysName:NotApplicable
 					190: Set Target: .. 	
 				190z: End If	
