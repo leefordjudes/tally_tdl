@@ -47,6 +47,7 @@
 			Width	: 30
 			Max		: 250
 			Storage	: APAuthToken
+			Style   : Small
 			Tool Tip : "Please Enter Auth Token, Get it from Tenant API"
 		
 

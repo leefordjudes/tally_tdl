@@ -7,7 +7,7 @@
 	
 	Key Item: "Masters"				: M : Menu	:	AP Masters
 	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
-	Key Item: "Txn Configuration"	: X : Alter	:	AP Txn Configuration
+	Key Item: "Txn Configurations"	: X : Alter	:	AP Txn Configuration
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
 
 
@@ -18,6 +18,7 @@
 	
 
 [Include: udf.txt]
+[Include: company_details.txt]
 [Include: configuration/configuration.txt]
 [Include: masters/masters.txt]
 [Include: transactions/transaction_configuration.txt]

@@ -2,6 +2,7 @@
 	Title	: 	Auditplus Transaction Configuration
 	Form	: 	AP Txn Configuration
 	Object	:	Company	:	##SVCurrentCompany
+
 	
 [Form: AP Txn Configuration]	
 	Parts		: Form SubTitle, AP Txn Configuration Body	
@@ -9,9 +10,10 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
+	On			: Form Accept: Yes: Call: APSaveVoucher:AP Txn From Date,Ap Txn To Date
 	
 [Part: AP Txn Configuration Body]
-	Lines:	AP Txn From Date, AP Txn To Date, Ap Txn Voucher Type
+	Lines:	AP Txn From Date, AP Txn To Date, ;;Ap Txn Voucher Type
 	
 	[Line: AP Txn From Date]
 		Fields: Medium Prompt, AP Txn From Date
@@ -19,10 +21,13 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
 		
 		[Field: AP Txn From Date]
+			Year : $$YearOfDate:##SvCurrentDate
+			ZM: $$ZeroFill:($$MonthOfDate:##SvCurrentDate):2
+			ZD: $$ZeroFill:($$DayofDate:##SvCurrentDate):2
 			Width	: 30
 			Max		: 250
-			Type	: Date
-			Storage	: APTxnFromDate
+			Type	: String
+			Set as	: $$String:@Year+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Style   : Normal Bold
 			Case    : Lower Case
 			
@@ -32,22 +37,27 @@
 		Space Bottom	: 0.4
 		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
 		
-		[Field: AP Txn To Date]
+		[Field: AP Txn To Date]	
+			Year : $$YearOfDate:##SvCurrentDate
+			ZM: $$ZeroFill:($$MonthOfDate:##SvCurrentDate):2
+			ZD: $$ZeroFill:($$DayofDate:##SvCurrentDate):2
 			Width	: 30
 			Max		: 250
-			Type	: Date
-			Storage	: APTxnToDate
+			Type	: String
+			Set as	: $$String:@Year+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Style   : Normal Bold
 			Case    : Lower Case
+			Format	: 'YYYY-MM-DD'
 	
-	[Line: Ap Txn Voucher Type]
-		Fields: Medium Prompt, AP Txn Voucher Type
-		Space Bottom	: 1
-		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
-		
-		[Field: AP Txn Voucher Type]
-			Width		: 30
-			Max			: 250
-			Storage		: APTxnVoucherType
-			Show Table	: Always
-			Table		: TallyVoucherTypes
+;	[Line: Ap Txn Voucher Type]
+;		Fields: Medium Prompt, AP Txn Voucher Type
+;		Space Bottom	: 1
+;		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
+;		
+;		[Field: AP Txn Voucher Type]
+;			Width		: 30
+;			Max			: 250
+;			Storage		: APTxnVoucherType
+;			Show Table	: Always
+;			Table		: TallyVoucherTypes
+;			Tooltip		: "This is not used to download vouchers, instead mapped voucher types used."

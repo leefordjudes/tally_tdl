@@ -14,8 +14,8 @@
 	AP Txn Voucher Type		: 	String		: 25010
 	
 	
-	AP Txn From Date		: 	Date		: 25001
-	AP Txn To Date			: 	Date		: 25002
+	AP Txn From Date		: 	String		: 25011
+	AP Txn To Date			: 	String		: 25012
 				
 
 	AP Id					: 	Number		: 25001

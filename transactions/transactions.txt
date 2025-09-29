@@ -1,5 +1,7 @@
 [System: Formula]
 	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName
+	ApTxnFromDate: $(Company, ##SVCurrentCompany).ApTxnFromDate
+	ApTxnToDate: $ApTxnToDate:Company:##SVCurrentCompany				
 	
 [Collection: APVoucherTypesMapped]
 	Type	: APVoucherTypes:Company
@@ -23,11 +25,15 @@
 			[Field: ExportVoucherRequest From Date]
 				Type: String
 				JSONTag: "from_date"
-				Set as: "2025-09-20"
+;				Set as: $ApTxnFromDate:Company:##SVCurrentCompany
+;				Set as: "2025-09-20"
+				Set As: @@ApTxnFromDate
 			[Field: ExportVoucherRequest To Date]
 				Type: String
 				JSONTag: "to_date"
-				Set as: "2025-09-20"	
+				Set as: $ApTxnToDate:Company:##SVCurrentCompany
+;				Set as: "2025-09-20"
+;				Set As: @@ApTxnToDate
 			[Field: ExportVoucherRequest Voucher Type Id]
 				Type: Number
 				JSONTag: "voucher_type_id"
@@ -39,8 +45,11 @@
 
 
 [Function: APSaveVoucher]
-	Local Formula: FromDate: "2025-09-20"
-	Local Formula: ToDate: "2025-09-20"
+;	Local Formula: FromDate: "2025-09-20"
+;	Local Formula: ToDate: "2025-09-20"
+	Parameter: FromDate: String 
+	Parameter: ToDate: String
+	
 	Variable: VTypeIdVar: Number
 	Variable: VTypeNameVar: String
 	
@@ -77,7 +86,8 @@
 	3: Else:  
 	4:  Set: Out: "Regular"
 	5: End If
-	6: Return: Out
+	6: Return: ##Out
+	
 
 [Variable: AP Master Map]
 	Variable: Id			: Number
@@ -100,24 +110,32 @@
 	Local Formula: Lc: $$ListCount:LedgerMapList
 	
 	Local Formula: rate: $rate
-	Local Formula: qty: $qty * -1
-		
+	Local Formula: qty: $qty * -1		
 	
 	100 : SET        	: SVViewName 			: $$SysName:InvVchView
 	200	: NEW OBJECT 	: Voucher	
-	300	: SET VALUE 	: Date 					: "20250401"	
+	300	: SET VALUE 	: Date 					: $date	
 	400	: SET VALUE 	: VoucherTypeName 		: ##VTypeNameVar
 ;	500	: SET VALUE 	: VoucherNumber			: $voucher_no
-	600 : SET VALUE 	: PartyLedgerName 		: "Cash"
+;	600 : SET VALUE 	: PartyLedgerName 		: "Cash" 	;; get it from first item of ac txn
 	700 : SET VALUE 	: IsInvoice 			: Yes
-	800 : SET VALUE 	: Reference				: "$ref_no"
-	801 : Set 			: GstRegTypeVar			: $gst_reg_type
-	900 : SET VALUE 	: GstRegistrationType	: @PartyGstRegType ;"Unregistered/Consumer" ;@GetPartyGstRegistration
-	1000 : SET VALUE 	: BasicBuyerName 		: "Cash"
-	1100 : SET VALUE 	: PartyMailingName		: "Cash"
-	1200 : SET VALUE 	: StateName				: "Tamil Nadu"
-	1300 : SET VALUE 	: CountryOfResidence	: "India"
-	1400 : SET VALUE 	: PlaceOfSupply			: "Tamil Nadu"
+	710: If: Not $$IsEmpty:$ref_no
+		720: 	SET VALUE 	: Reference			: $ref_no	
+	730: End If 
+	800: SET VALUE 	: GstRegistrationType		: "Unregistered/Consumer"
+	900: If:  Not $$IsEmpty:$gst_reg_type
+		910:  	SET		    : GstRegTypeVar			: $gst_reg_type	
+		920: 	SET VALUE 	: GstRegistrationType	: @PartyGstRegType
+	930: End If	 	
+;	1000 : SET VALUE 	: BasicBuyerName 		: "Cash"	;; get it from first item of ac txn
+	1100 : SET VALUE 	: PartyMailingName		: $party_name
+	1200 : SET VALUE 	: StateName				: @@GetCompanyStateName
+	1300 : SET VALUE 	: CountryOfResidence	: @@GetCompanyCountryName
+	1310 : If: Not $$IsEmpty:$gst_location
+		1320: 	SET VALUE 	: PlaceOfSupply			: $gst_location
+	1330 : Else	
+		1340 : SET VALUE 	: PlaceOfSupply			: "Tamil Nadu"
+	1350 : End If 
 	1600 : Walk Collection: ac_trns
 		1700: Set: IdVar: $account_id  	
 		1800: Set: ListIdxVar: $$ListIndex:LedgerMapList:##IdVar
@@ -294,6 +312,7 @@
 			Use: NameField
 			Table: TallyLedgers,NotApplicable
 			Show Table: Always
+			Add: Key: Create Ledger
 			
 		[!Field: AP Map Tally Unit Name]
 			Use: NameField
@@ -304,6 +323,7 @@
 			Use: NameField
 			Table: TallyStockItems,NotApplicable
 			Show Table: Always
+			Add: Key: Create Stock Item
 			
 
 
