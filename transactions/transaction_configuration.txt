@@ -1,8 +1,12 @@
-[Report: AP Txn Configuration]
-	Title	: 	Auditplus Transaction Configuration
-	Form	: 	AP Txn Configuration
-	Object	:	Company	:	##SVCurrentCompany
+[Function: AP Txn Configuration Submit]		
+	010: Set: TxnVchFromDate:#APTxnFromDate
+	020: Set: TxnVchToDate:#APTxnToDate
 
+[Report: AP Txn Configuration]
+	Title	: 	Transaction Configuration
+	Form	: 	AP Txn Configuration
+;	Object	:	Company	:	##SVCurrentCompany
+	
 	
 [Form: AP Txn Configuration]	
 	Parts		: Form SubTitle, AP Txn Configuration Body	
@@ -10,10 +14,10 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
-	On			: Form Accept: Yes: Call: APSaveVoucher:AP Txn From Date,Ap Txn To Date
-	
+;	On			: Form Accept: Yes : Call: AP Txn Configuration Submit	
 [Part: AP Txn Configuration Body]
 	Lines:	AP Txn From Date, AP Txn To Date, ;;Ap Txn Voucher Type
+	
 	
 	[Line: AP Txn From Date]
 		Fields: Medium Prompt, AP Txn From Date
@@ -21,15 +25,16 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
 		
 		[Field: AP Txn From Date]
-			Year : $$YearOfDate:##SvCurrentDate
+			YR: $$YearOfDate:##SvCurrentDate
 			ZM: $$ZeroFill:($$MonthOfDate:##SvCurrentDate):2
 			ZD: $$ZeroFill:($$DayofDate:##SvCurrentDate):2
-			Width	: 30
-			Max		: 250
-			Type	: String
-			Set as	: $$String:@Year+"-"+$$String:@ZM+"-"+$$String:@ZD
-			Style   : Normal Bold
-			Case    : Lower Case
+			Width		: 30
+			Max			: 250
+			Type		: String
+			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+			Modifies	: TxnVchFromDate : Yes
+			Style   	: Normal Bold
+			Case    	: Lower Case
 			
 
 	[Line: Ap Txn To Date]
@@ -38,17 +43,17 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
 		
 		[Field: AP Txn To Date]	
-			Year : $$YearOfDate:##SvCurrentDate
+			YR: $$YearOfDate:##SvCurrentDate
 			ZM: $$ZeroFill:($$MonthOfDate:##SvCurrentDate):2
 			ZD: $$ZeroFill:($$DayofDate:##SvCurrentDate):2
-			Width	: 30
-			Max		: 250
-			Type	: String
-			Set as	: $$String:@Year+"-"+$$String:@ZM+"-"+$$String:@ZD
-			Style   : Normal Bold
-			Case    : Lower Case
-			Format	: 'YYYY-MM-DD'
-	
+			Width		: 30
+			Max			: 250
+			Type		: String
+			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+			Modifies	: TxnVchToDate : Yes
+			Style   	: Normal Bold
+			Case    	: Lower Case
+		
 ;	[Line: Ap Txn Voucher Type]
 ;		Fields: Medium Prompt, AP Txn Voucher Type
 ;		Space Bottom	: 1

@@ -1,7 +1,9 @@
 [System: Formula]
-	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName
-	ApTxnFromDate: $(Company, ##SVCurrentCompany).ApTxnFromDate
-	ApTxnToDate: $ApTxnToDate:Company:##SVCurrentCompany				
+	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName	
+
+[System: Variables]
+	Variable : TxnVchFromDate : String	
+	Variable : TxnVchToDate : String	
 	
 [Collection: APVoucherTypesMapped]
 	Type	: APVoucherTypes:Company
@@ -24,16 +26,16 @@
 			
 			[Field: ExportVoucherRequest From Date]
 				Type: String
-				JSONTag: "from_date"
-;				Set as: $ApTxnFromDate:Company:##SVCurrentCompany
+				JSONTag: "from_date"	
 ;				Set as: "2025-09-20"
-				Set As: @@ApTxnFromDate
+				Set as: ##TxnVchFromDate
+;				Set as: @@ExpVchFromDate
 			[Field: ExportVoucherRequest To Date]
 				Type: String
 				JSONTag: "to_date"
-				Set as: $ApTxnToDate:Company:##SVCurrentCompany
 ;				Set as: "2025-09-20"
-;				Set As: @@ApTxnToDate
+				Set as: ##TxnVchToDate
+;				Set as: @@ExpVchToDate
 			[Field: ExportVoucherRequest Voucher Type Id]
 				Type: Number
 				JSONTag: "voucher_type_id"
@@ -44,11 +46,12 @@
 	RemoteRequest	: AP Tally Export Voucher Request: UTF8
 
 
+
 [Function: APSaveVoucher]
 ;	Local Formula: FromDate: "2025-09-20"
 ;	Local Formula: ToDate: "2025-09-20"
-	Parameter: FromDate: String 
-	Parameter: ToDate: String
+;	Variable: TxnVchFromDate: String
+;	Variable: TxnVchToDate: String
 	
 	Variable: VTypeIdVar: Number
 	Variable: VTypeNameVar: String
@@ -59,14 +62,23 @@
 	LIST VARIABLE 	: StockItem Map List 	: String
 	LIST VARIABLE 	: StockItem Add List 	: String
 	
-;	Local Formula: lstfnd: ##LedgerMapList[$$ListIndex:LedgerMapList:$account_id]
+;	Local Formula: fd: ##TxnVchFromDate
+;	Local Formula: td: ##TxnVchToDate
 	
+;	Local Formula: lstfnd: ##LedgerMapList[$$ListIndex:LedgerMapList:$account_id]
+
+ 	
 100: Set Object: (Company, ##SVCurrentCompany).	 
+110: Alter: AP Txn Configuration
+120: Msg Box: "fd1":##TxnVchFromDate
+130: Msg Box: "td1":##TxnVchToDate
 200: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
 201: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
 300: Walk Collection: APVoucherTypesMapped
 	400: Set: VTypeIdVar	: $APId
 	500: Set: VTypeNameVar	: $APTallyName	
+	501: Msg Box: "fd2":##TxnVchFromDate
+	502: Msg Box: "td2":##TxnVchToDate
 	600: Walk Collection: AP Tally Export Voucher Data Source	
 		700: Walk Collection: data		
 			800: call : APSaveEachVoucher
