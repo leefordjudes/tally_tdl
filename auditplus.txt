@@ -7,7 +7,6 @@
 	
 	Key Item: "Masters"				: M : Menu	:	AP Masters
 	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
-	Key Item: "Txn Configurations"	: X : Alter	:	AP Txn Configuration
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
 
 
