@@ -70,15 +70,15 @@
  	
 100: Set Object: (Company, ##SVCurrentCompany).	 
 110: Alter: AP Txn Configuration
-120: Msg Box: "fd1":##TxnVchFromDate
-130: Msg Box: "td1":##TxnVchToDate
+;120: Msg Box: "fd1":##TxnVchFromDate
+;130: Msg Box: "td1":##TxnVchToDate
 200: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
 201: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
 300: Walk Collection: APVoucherTypesMapped
 	400: Set: VTypeIdVar	: $APId
 	500: Set: VTypeNameVar	: $APTallyName	
-	501: Msg Box: "fd2":##TxnVchFromDate
-	502: Msg Box: "td2":##TxnVchToDate
+;	501: Msg Box: "fd2":##TxnVchFromDate
+;	502: Msg Box: "td2":##TxnVchToDate
 	600: Walk Collection: AP Tally Export Voucher Data Source	
 		700: Walk Collection: data		
 			800: call : APSaveEachVoucher
