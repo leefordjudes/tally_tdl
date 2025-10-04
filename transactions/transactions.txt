@@ -1,3 +1,5 @@
+;[Include: tally_export_voucher_request.txt]
+
 [System: Formula]
 	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName	
 
@@ -6,47 +8,10 @@
 	Variable : TxnVchToDate : String	
 	
 [Collection: APVoucherTypesMapped]
-	Type	: APVoucherTypes:Company
-	Filter	: VchTypeMappedFlt
-
-[Report: AP Tally Export Voucher Request]
-	Use: Rpc Request
+	Type		: APVoucherTypes:Company
+	Filter		: VchTypeMappedFlt
+;	Child Of	: $(Company, ##SVCurrentCompany)
 	
-	Local: Part: Rpc Request Data: Delete: Part: Rpc Request Filter
-	Local: Part: Rpc Request Data: Add: Part: Export Voucher Request
-	
-	Local: Field: Rpc Request Method: Set as: "tally_export_voucher"
-	
-[Part: Export Voucher Request]
-	Line: Export Voucher Request
-	Scroll: Vertical
-	
-	[Line: Export Voucher Request]
-		Fields: ExportVoucherRequest From Date, ExportVoucherRequest To Date, ExportVoucherRequest Voucher Type Id
-			
-			[Field: ExportVoucherRequest From Date]
-				Type: String
-				JSONTag: "from_date"	
-;				Set as: "2025-09-20"
-				Set as: ##TxnVchFromDate
-;				Set as: @@ExpVchFromDate
-			[Field: ExportVoucherRequest To Date]
-				Type: String
-				JSONTag: "to_date"
-;				Set as: "2025-09-20"
-				Set as: ##TxnVchToDate
-;				Set as: @@ExpVchToDate
-			[Field: ExportVoucherRequest Voucher Type Id]
-				Type: Number
-				JSONTag: "voucher_type_id"
-				Set as: ##VTypeIdVar
-
-[Collection: AP Tally Export Voucher Data Source]
-	Use				: Rpc Data Source
-	RemoteRequest	: AP Tally Export Voucher Request: UTF8
-
-
-
 [Function: APSaveVoucher]
 ;	Local Formula: FromDate: "2025-09-20"
 ;	Local Formula: ToDate: "2025-09-20"
@@ -61,32 +26,89 @@
 	
 	LIST VARIABLE 	: StockItem Map List 	: String
 	LIST VARIABLE 	: StockItem Add List 	: String
-	
-;	Local Formula: fd: ##TxnVchFromDate
-;	Local Formula: td: ##TxnVchToDate
-	
-;	Local Formula: lstfnd: ##LedgerMapList[$$ListIndex:LedgerMapList:$account_id]
+;	LIST VARIABLE 	: VoucherType Map List 	: String	
 
- 	
-100: Set Object: (Company, ##SVCurrentCompany).	 
+100: Set Object: (Company, ##SVCurrentCompany). 	
 110: Alter: AP Txn Configuration
-;120: Msg Box: "fd1":##TxnVchFromDate
-;130: Msg Box: "td1":##TxnVchToDate
 200: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
 201: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
-300: Walk Collection: APVoucherTypesMapped
+;202: LIST FILL : VoucherType Map List : APVoucherTypes : $APId : $APTallyName
+300: Walk Collection: APVoucherTypesMapped	
 	400: Set: VTypeIdVar	: $APId
 	500: Set: VTypeNameVar	: $APTallyName	
-;	501: Msg Box: "fd2":##TxnVchFromDate
-;	502: Msg Box: "td2":##TxnVchToDate
-	600: Walk Collection: AP Tally Export Voucher Data Source	
+	501: Msg Box: $APId:$APTallyName		
+	600: Walk Collection: TallyExportVoucher Data Source
 		700: Walk Collection: data		
-			800: call : APSaveEachVoucher
-		900: End Walk
-		1000 : Call: AP Update Map
-		1001: Msg Box: "Voucher Created":"Success"
+			701: Msg Box: $id:$voucher_no		
+;			800: call : APSaveEachVoucher		
+		900: End Walk	
+;		1000 : Call: AP Update Map
+;		1001: Msg Box: "Voucher Created":"Success"
 	1100: End Walk
 1200: End Walk
+
+
+[Collection: TallyExportVoucher Data Source]
+	Data Source		: HTTP JSON: @@APHost: UTF8
+	RemoteRequest	: TallyExportVoucher Rpc Request: UTF8
+	Export Header	: "organization:" + @@APOrganization
+	Export Header	: "auth_token:" + @@APAuthToken	
+
+
+;;----------------------------RPC Request Start---------------------	
+
+[Report: TallyExportVoucher Rpc Request]
+	Form: TallyExportVoucher Rpc Request
+	Plain JSON: Yes
+		
+[Form: TallyExportVoucher Rpc Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: TallyExportVoucher Rpc Request Method, TallyExportVoucher Rpc Request Data
+	
+
+[Part: TallyExportVoucher Rpc Request Method]
+	Line: TallyExportVoucher Rpc Request Method
+	Scroll: Vertical
+	
+	[Line: TallyExportVoucher Rpc Request Method]
+		Field: TallyExportVoucher Rpc Request Method
+			
+			[Field: TallyExportVoucher Rpc Request Method]
+				Use: Name Field
+				JSONTag: "method"
+				Set as: "tally_export_voucher"
+				
+[Part: TallyExportVoucher Rpc Request Data]
+	Line: TallyExportVoucher Request Data
+	JSONTag: "data"
+	Scroll: Vertical
+
+	[Line: TallyExportVoucher Request Data]
+		Field: TallyExportVoucher Request From Date
+		Field: TallyExportVoucher Request To Date
+		Field: TallyExportVoucher Request Voucher Type Id
+			
+			[Field: TallyExportVoucher Request From Date]
+				Type: String
+				JSONTag: "from_date"	
+;				Set as: "2025-09-27"
+				Set as: ##TxnVchFromDate
+;				Set as: @@ExpVchFromDate
+			[Field: TallyExportVoucher Request To Date]
+				Type: String
+				JSONTag: "to_date"
+;				Set as: "2025-09-27"
+				Set as: ##TxnVchToDate
+;				Set as: @@ExpVchToDate
+			[Field: TallyExportVoucher Request Voucher Type Id]
+				Type: Number
+				JSONTag: "voucher_type_id"
+;				Set as: 5
+				Set as: ##VTypeIdVar
+				
+;;----------------------------RPC Request End---------------------	
 
 [Function: GetPartyGstRegistrationType]
 		Parameter	: RegType	: String

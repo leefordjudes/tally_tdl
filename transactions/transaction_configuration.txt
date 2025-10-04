@@ -1,11 +1,11 @@
-[Function: AP Txn Configuration Submit]		
-	010: Set: TxnVchFromDate:#APTxnFromDate
-	020: Set: TxnVchToDate:#APTxnToDate
+;[Function: AP Txn Configuration Submit]		
+;	010: Set: TxnVchFromDate:#APTxnFromDate
+;	020: Set: TxnVchToDate:#APTxnToDate
 
 [Report: AP Txn Configuration]
 	Title	: 	Transaction Configuration
 	Form	: 	AP Txn Configuration
-;	Object	:	Company	:	##SVCurrentCompany
+;	Object	:	Company	: ##SVCurrentCompany
 	
 	
 [Form: AP Txn Configuration]	
@@ -14,7 +14,7 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
-	On			: Form Accept: Yes : Call: AP Txn Configuration Submit	
+;	On			: Form Accept: Yes : Call: AP Txn Configuration Submit	
 
 [Part: AP Txn Configuration Body]
 	Lines:	AP Txn From Date, AP Txn To Date, ;;Ap Txn Voucher Type

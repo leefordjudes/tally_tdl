@@ -27,8 +27,9 @@
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Add: Key: Create Stock Item
 
 [Collection: APStockItems]
-	Type: APStockItems:Company
-	Filter		: NOT FilterMapped
+	Type		: APStockItems	:	Company
+;	Filter		: NOT FilterMapped
+	Child Of	: ##SVCurrentCompany
 
 [Function: AP Delete ALL Stock Item]
 	002: Set Object: (Company, ##SVCurrentCompany).	 

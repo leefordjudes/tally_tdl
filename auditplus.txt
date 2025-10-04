@@ -8,6 +8,7 @@
 	Key Item: "Masters"				: M : Menu	:	AP Masters
 	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
+	Key Item: "Http Test" 			: H	: Call	: 	HttpTest
 
 
 [System: Formula]
@@ -22,6 +23,7 @@
 [Include: masters/masters.txt]
 [Include: transactions/transactions.txt]
 [Include: transactions/transaction_configuration.txt]
+[Include: transactions/httptest.txt]
 
 
 [Collection: Rpc Data Source]
