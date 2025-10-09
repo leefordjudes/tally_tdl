@@ -1,11 +1,17 @@
 ;[Function: AP Txn Configuration Submit]		
-;	010: Set: TxnVchFromDate:#APTxnFromDate
-;	020: Set: TxnVchToDate:#APTxnToDate
+;	000: Set Object: (Company, ##SVCurrentCompany).
+;	010: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
+;	020: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
+;	021: Set Object ..
+;	030: Call: APSaveVoucher
+;;	010: Set: TxnVchFromDate:#APTxnFromDate
+;;	020: Set: TxnVchToDate:#APTxnToDate
+
 
 [Report: AP Txn Configuration]
 	Title	: 	Transaction Configuration
 	Form	: 	AP Txn Configuration
-;	Object	:	Company	: ##SVCurrentCompany
+	Object	:	Company	: ##SVCurrentCompany
 	
 	
 [Form: AP Txn Configuration]	
@@ -14,21 +20,27 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
+	On 			: Form Accept: Yes: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
+	On 			: Form Accept: Yes: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
+	On 			: Form Accept: Yes: LIST FILL : VoucherType Map List : APVoucherTypesMapped : $APId : $APTallyName
+	On			: Form Accept: Yes: Call: APSaveVoucher
 ;	On			: Form Accept: Yes : Call: AP Txn Configuration Submit	
 
 [Part: AP Txn Configuration Body]
-	Lines:	AP Txn From Date, AP Txn To Date, ;;Ap Txn Voucher Type
+	Line:	AP Txn From Date
+;	Line:	AP Txn To Date
+	Line:	Ap Txn Voucher Type
 	
 	
 	[Line: AP Txn From Date]
 		Fields: Medium Prompt, AP Txn From Date
 		Space Bottom	: 0.4				
-		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
+		Local	:	Field	:	Medium Prompt	: Info		: "Date" ;"From Date"
 		
 		[Field: AP Txn From Date]
-			YR: $$YearOfDate:##SvCurrentDate
-			ZM: $$ZeroFill:($$MonthOfDate:##SvCurrentDate):2
-			ZD: $$ZeroFill:($$DayofDate:##SvCurrentDate):2
+			YR: $$YearOfDate:$$SysInfo:SystemDate
+			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
+			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
 			Width		: 30
 			Max			: 250
 			Type		: String
@@ -38,32 +50,32 @@
 			Case    	: Lower Case
 			
 
-	[Line: Ap Txn To Date]
-		Fields: Medium Prompt, Ap Txn To Date
-		Space Bottom	: 0.4
-		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
-		
-		[Field: AP Txn To Date]	
-			YR: $$YearOfDate:##SvCurrentDate
-			ZM: $$ZeroFill:($$MonthOfDate:##SvCurrentDate):2
-			ZD: $$ZeroFill:($$DayofDate:##SvCurrentDate):2
-			Width		: 30
-			Max			: 250
-			Type		: String
-			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
-			Modifies	: TxnVchToDate : Yes
-			Style   	: Normal Bold
-			Case    	: Lower Case
-		
-;	[Line: Ap Txn Voucher Type]
-;		Fields: Medium Prompt, AP Txn Voucher Type
-;		Space Bottom	: 1
-;		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
+;	[Line: Ap Txn To Date]
+;		Fields: Medium Prompt, Ap Txn To Date
+;		Space Bottom	: 0.4
+;		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
 ;		
-;		[Field: AP Txn Voucher Type]
+;		[Field: AP Txn To Date]	
+;			YR: $$YearOfDate:$$SysInfo:SystemDate
+;			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
+;			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
 ;			Width		: 30
 ;			Max			: 250
-;			Storage		: APTxnVoucherType
-;			Show Table	: Always
-;			Table		: TallyVoucherTypes
-;			Tooltip		: "This is not used to download vouchers, instead mapped voucher types used."
+;			Type		: String
+;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+;			Modifies	: TxnVchToDate : Yes
+;			Style   	: Normal Bold
+;			Case    	: Lower Case
+		
+	[Line: Ap Txn Voucher Type]
+		Fields: Medium Prompt, AP Txn Voucher Type
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
+		
+		[Field: AP Txn Voucher Type]
+			Width		: 30
+			Max			: 250
+			Modifies	: TxnVchTypeId : Yes
+			Show Table	: Always
+			Table		: APVoucherTypesMapped
+			Tooltip		: "Mapped voucher types"

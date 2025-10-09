@@ -28,8 +28,7 @@
 [Collection: APLedgers]
 	Type		: APLedgers		:	Company
 ;	Filter		: NOT FilterMapped
-	Child Of	: ##SVCurrentCompany
-
+	Child of    : ##SVCurrentCompany
 
 [Function: AP Delete ALL Ledger]
 	010: Set Object: (Company, ##SVCurrentCompany).	 
