@@ -1,13 +1,8 @@
-;[Function: AP Txn Configuration Submit]		
-;	000: Set Object: (Company, ##SVCurrentCompany).
-;	010: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
-;	020: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
-;	021: Set Object ..
-;	030: Call: APSaveVoucher
-;;	010: Set: TxnVchFromDate:#APTxnFromDate
-;;	020: Set: TxnVchToDate:#APTxnToDate
-
-
+;[Variable: AP Txn Voucher Only]
+;	Type		: Logical
+;	Default		: Yes
+;	Persistent	: Yes
+	
 [Report: AP Txn Configuration]
 	Title	: 	Transaction Configuration
 	Form	: 	AP Txn Configuration
@@ -20,28 +15,38 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
-	On 			: Form Accept: Yes: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
+	On 			: Form Accept: Yes: LIST FILL : Ledger Map List : APLedgers : ($$String:$APId) : $APTallyName
 	On 			: Form Accept: Yes: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
 	On 			: Form Accept: Yes: LIST FILL : VoucherType Map List : APVoucherTypesMapped : $APId : $APTallyName
 	On			: Form Accept: Yes: Call: APSaveVoucher
-;	On			: Form Accept: Yes : Call: AP Txn Configuration Submit	
 
 [Part: AP Txn Configuration Body]
+	Line:	Ap Txn Voucher Only	
 	Line:	AP Txn From Date
-;	Line:	AP Txn To Date
+	Line:	AP Txn To Date
 	Line:	Ap Txn Voucher Type
 	
 	
+	[Line:	Ap Txn Voucher Only]
+		Fields:	Medium Prompt, Ap Txn Voucher Only
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Only"
+		
+		[Field: AP Txn Voucher Only]
+			Use         : Logical Field
+			Modifies    : Txn Voucher Only
+			Set As		: If $$IsEmpty:##TxnVoucherOnly Then Yes else ##TxnVoucherOnly
+			
 	[Line: AP Txn From Date]
 		Fields: Medium Prompt, AP Txn From Date
 		Space Bottom	: 0.4				
-		Local	:	Field	:	Medium Prompt	: Info		: "Date" ;"From Date"
+		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
 		
 		[Field: AP Txn From Date]
 			YR: $$YearOfDate:$$SysInfo:SystemDate
 			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
 			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
-			Width		: 30
+			Width		: 20
 			Max			: 250
 			Type		: String
 			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
@@ -50,22 +55,22 @@
 			Case    	: Lower Case
 			
 
-;	[Line: Ap Txn To Date]
-;		Fields: Medium Prompt, Ap Txn To Date
-;		Space Bottom	: 0.4
-;		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
-;		
-;		[Field: AP Txn To Date]	
-;			YR: $$YearOfDate:$$SysInfo:SystemDate
-;			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
-;			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
-;			Width		: 30
-;			Max			: 250
-;			Type		: String
-;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
-;			Modifies	: TxnVchToDate : Yes
-;			Style   	: Normal Bold
-;			Case    	: Lower Case
+	[Line: Ap Txn To Date]
+		Fields: Medium Prompt, Ap Txn To Date
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
+		
+		[Field: AP Txn To Date]	
+			YR: $$YearOfDate:$$SysInfo:SystemDate
+			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
+			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
+			Width		: 20
+			Max			: 250
+			Type		: String
+			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+			Modifies	: TxnVchToDate : Yes
+			Style   	: Normal Bold
+			Case    	: Lower Case
 		
 	[Line: Ap Txn Voucher Type]
 		Fields: Medium Prompt, AP Txn Voucher Type
@@ -73,9 +78,10 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
 		
 		[Field: AP Txn Voucher Type]
-			Width		: 30
+			Width		: 20
 			Max			: 250
 			Modifies	: TxnVchTypeId : Yes
+			Style   	: Normal Bold
 			Show Table	: Always
 			Table		: APVoucherTypesMapped
 			Tooltip		: "Mapped voucher types"

@@ -23,9 +23,9 @@
 	010 : Query Box: "Do you want to download masters" : Yes: No
 	020	: 	If	: $$LastResult			
 		021: Set Object: (Company, ##SVCurrentCompany).
-		021a: LIST FILL : Ledger Map List 		: APLedgers 		: $APId 		: $APTallyName
-		021b: LIST FILL : StockItem Map List 	: APStockItems 		: $APHsnCode 	: $APTallyName
-		021c: LIST FILL : VoucherType Map List 	: APVoucherTypes 	: $APId 		: $APTallyName
+		021a: LIST FILL : LedgerMapList 		: APLedgers 		: $APId 		: $APTallyName
+		021b: LIST FILL : StockItemMapList 		: APStockItems 		: $APHsnCode 	: $APTallyName
+		021c: LIST FILL : VoucherTypeMapList 	: APVoucherTypes 	: $APId 		: $APTallyName
 		022: START PROGRESS	: 4:"Downloading":"Masters"		
 		030: Walk Collection: AP Tally Export Master Data Source 			
 			040: SET TARGET	: (Company, ##SVCurrentCompany).

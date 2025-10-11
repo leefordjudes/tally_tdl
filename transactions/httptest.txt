@@ -1,5 +1,7 @@
 [Function: HttpTest]	
 	000: Set Object: (Company, ##SVCurrentCompany).
+	001: Msg Box: "company":$Name
+	002: Set Object: ..
 	100: Walk Collection: Http Data Source	
 		200: Walk Collection: data		
 			300: Msg Box: $id:$voucher_no

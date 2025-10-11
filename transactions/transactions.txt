@@ -1,11 +1,14 @@
+[Include: tally_export_voucher_request.txt]
+
 [System: Formula]
 	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName	
 
 [System: Variables]
 	Variable : TxnVchFromDate 	: String	
-	Variable : TxnVchToDate 	: String	
+	Variable : TxnVchToDate 	: String
 	Variable : TxnVchTypeId		: Number
 	Variable : TxnVchTypeName	: String
+	Variable : TxnVoucherOnly	: Logical: Yes
 	
 	LIST VARIABLE 	: Ledger Map List 	: String
 	LIST VARIABLE 	: Ledger Add List 	: String
@@ -16,37 +19,6 @@
 	LIST VARIABLE 	: VoucherType Map List 	: String
 	
 	
-	
-[Report: APSaveVoucher]
-	Object: Company: ##SVCurrentCompany
-	Form: APSaveVoucher
-	
-[Form: APSaveVoucher]
-	Part: APSaveVoucher
-	Buttons: APSaveVoucherFn
-	Height: 100% screen
-	Width: 100% screen
-	
-[Part: APSaveVoucher]
-	Line: APSaveVoucher
-	Repeat: APSaveVoucher: APVoucherTypesMapped
-	Scroll: Vertical
-	
-	[Line: APSaveVoucher]
-		Field: VchTypeId, VchTypeName
-		
-		[Field: VchTypeId]
-			Set as: $ApId
-			
-		[Field: VchTypeName]
-			Set as: $ApTallyName
-
-	
-[Button: APSaveVoucherFn]
-	Key: F4
-	Action: Call : APSaveVoucher
-	Title: "Download Voucher"		
-	
 [Collection: APVoucherTypesMapped]
 	Use			: APVoucherTypes
 	Filter		: VchTypeMappedFlt
@@ -56,90 +28,19 @@
 	
 	
 [Function: APSaveVoucher]
-;	Variable: VTypeIdVar: Number
-;	Variable: VTypeNameVar: String
-	
-;	Local Formula: Lc1: $$ListCount:LedgerMapList
-;	Local Formula: Lc2: $$ListCount:StockItemMapList
+	Variable: SkippedVch : Number
 	Local Formula: VtypName: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
 
-;100: Set Object: (Company, ##SVCurrentCompany). 	;;=> commented here
-;200: LIST FILL : Ledger Map List : APLedgers : $APId : $APTallyName
-;lc1: Msg Box: "lc1":@Lc1
-;201: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
-;lc2: Msg Box: "lc2":@Lc2
-;300: Walk Collection: APVoucherTypesMapped			;;=> Shows Error as (Memory access voilation)
-;	400: Set: VTypeIdVar	: $APId
-;	500: Set: VTypeNameVar	: $APTallyName	
+	100: Walk Collection: TallyExportVoucher Data Source
+;		mb2: Msg Box: $id:$voucher_no	
+		200: call : APSaveEachVoucher
+	300: End Walk
+	400: Call: AP Update Map
+	500: Msg Box: "Result":@VtypName+" Vouchers\n Successfully Created"
+	600: If: ##SkippedVch > 0 
+		700: Msg Box: "Skipped Vouchers": ##SkippedVch
+	800: End If
 
-;	501: Msg Box: $APId:$APTallyName		
-	550: Msg Box: "vchtype": @VtypName
-;	551: Set: VTypeIdVar	: ##TxnVchTypeId
-;	552: Set: VTypeNameVar	: "Sales";##TxnVchTypeName
-	600: Walk Collection: TallyExportVoucher Data Source
-;		700: Walk Collection: data		
-			701: Msg Box: $id:$voucher_no	
-			800: call : APSaveEachVoucher
-;		900: End Walk	
-	1000: End Walk
-	1100 : Call: AP Update Map
-	1101: Msg Box: "Voucher Created":"Success"
-;1300: End Walk
-
-
-[Collection: TallyExportVoucher Data Source]
-	Data Source		: HTTP JSON: @@APHost: UTF8
-	JSON Object Path: "data:1"
-	RemoteRequest	: TallyExportVoucher Rpc Request: UTF8
-	Export Header	: "organization:" + @@APOrganization
-	Export Header	: "auth_token:" + @@APAuthToken	
-;;----------------------------RPC Request Start---------------------	
-[Report: TallyExportVoucher Rpc Request]
-	Form: TallyExportVoucher Rpc Request
-	Plain JSON: Yes
-		
-[Form: TallyExportVoucher Rpc Request]
-	Delete: XMLTag
-	Full Object: Yes
-	Belongs To: Yes
-	Part: TallyExportVoucher Rpc Request Method, TallyExportVoucher Rpc Request Data
-	
-[Part: TallyExportVoucher Rpc Request Method]
-	Line: TallyExportVoucher Rpc Request Method
-	Scroll: Vertical
-	
-	[Line: TallyExportVoucher Rpc Request Method]
-		Field: TallyExportVoucher Rpc Request Method
-			
-			[Field: TallyExportVoucher Rpc Request Method]
-				Use: Name Field
-				JSONTag: "method"
-				Set as: "tally_export_voucher"
-				
-[Part: TallyExportVoucher Rpc Request Data]
-	Line: TallyExportVoucher Request Data
-	JSONTag: "data"
-	Scroll: Vertical
-
-	[Line: TallyExportVoucher Request Data]
-		Field: TallyExportVoucher Request From Date
-		Field: TallyExportVoucher Request To Date
-		Field: TallyExportVoucher Request Voucher Type Id
-			
-			[Field: TallyExportVoucher Request From Date]
-				Type: String
-				JSONTag: "from_date"	
-				Set as: ##TxnVchFromDate
-			[Field: TallyExportVoucher Request To Date]
-				Type: String
-				JSONTag: "to_date"
-				Set as: ##TxnVchFromDate
-				
-			[Field: TallyExportVoucher Request Voucher Type Id]
-				Type: Number
-				JSONTag: "voucher_type_id"
-				Set as: ##TxnVchTypeId				
-;;----------------------------RPC Request End---------------------	
 
 [Function: GetPartyGstRegistrationType]
 		Parameter	: RegType	: String
@@ -161,140 +62,159 @@
 
 [Function: APSaveEachVoucher]
 	Variable: IdVar				:	Number
+	Variable: ListIdxVar		: 	Number
+
 	Variable: TallyNameVar		:	String
 	Variable: TallyStockItemVar	:	String
-	Variable: MapItemTypeVar 	: 	String
-	Variable: ListIdxVar		: 	Number
-	
+	Variable: MapItemTypeVar 	: 	String	
 	Variable: HsnCodeVar		: 	String	
 	Variable: GstRegTypeVar		: 	String
-
+	
+	Variable: CreateVch			:  Logical : Yes
 	
 	List Variable: LedgerToSaveVar: Ap Master Map 
 	
 	Local Formula: PartyGstRegType: $$GetPartyGstRegistrationType:##GstRegTypeVar
-	Local Formula: Lc: $$ListCount:LedgerMapList
-	
 	Local Formula: rate: $rate
-	Local Formula: qty: $qty * -1		
+	Local Formula: qty: $qty * -1	
 	
-;	m1: Msg Box: "step":"m1"
-	100 : SET        	: SVViewName 			: $$SysName:InvVchView
-	200	: NEW OBJECT 	: Voucher	
-	300	: SET VALUE 	: Date 					: $date	
-;	300b: Set: VTypeNameVar: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]  		
-	400	: SET VALUE 	: VoucherTypeName 		: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
-;	400	: SET VALUE 	: VoucherTypeName 		: ##VTypeNameVar
-;	500	: SET VALUE 	: VoucherNumber			: $voucher_no
-;	600 : SET VALUE 	: PartyLedgerName 		: "Cash" 	;; get it from first item of ac txn
-	600 : SET VALUE 	: PartyLedgerName 		: $party_name
-	601: SET VALUE 	: IsInvoice 			: No
-	610: If: $mode = "INVENTORY"
-	620: 	SET VALUE 	: IsInvoice 			: Yes	
-	650: End If
-	710: If: Not $$IsEmpty:$ref_no
-		720: 	SET VALUE 	: Reference			: $ref_no	
-	730: End If 
-	800: SET VALUE 	: GstRegistrationType		: "Unregistered/Consumer"
-	900: If:  Not $$IsEmpty:$gst_reg_type
-		910:  	SET		    : GstRegTypeVar			: $gst_reg_type	
-		920: 	SET VALUE 	: GstRegistrationType	: @PartyGstRegType
-	930: End If	 	
-	931: If: NOt $$IsEmpty:$gst_no
-		932: Set Value	: PartyGstIn			: $gst_no
-	933: End If
-;	1000 : SET VALUE 	: BasicBuyerName 		: "Cash"	;; get it from first item of ac txn
-	1000 : SET VALUE 	: BasicBuyerName		: $party_name	
-	1100 : SET VALUE 	: PartyMailingName		: $party_name
-	1200 : SET VALUE 	: StateName				: @@GetCompanyStateName
-	1300 : SET VALUE 	: CountryOfResidence	: @@GetCompanyCountryName
-	1310 : If: Not $$IsEmpty:$gst_location
-		1320: 	SET VALUE 	: PlaceOfSupply			: $gst_location
-	1330 : Else	
-		1340 : SET VALUE 	: PlaceOfSupply			: @@GetCompanyStateName
-	1350 : End If
-;	m2: Msg Box: "step":"m2"
-	1600 : Walk Collection: ac_trns
-		1700: Set: IdVar: $account_id  	
-		1800: Set: ListIdxVar: $$ListIndex:LedgerMapList:##IdVar
-		1900: Set: TallyNameVar: ##LedgerMapList[##ListIdxVar]  		
-		2000: If: $$IsEmpty:##TallyNameVar 
-			2100: Set: MapItemTypeVar : "Ledger"
-			2200: Alter: AP Map Tally Name
-			2300: If: Not $$IsEmpty:##TallyNameVar
-				2400: Set: LedgerMapList[##ListIdxVar]: ##TallyNameVar
-				2500: List Add:LedgerAddList:##IdVar:##TallyNameVar
-			2600: End if
-		2700: End If
-		2701: Set: HsnCodeVar: $hsn_code
+	Local Formula: lc: $$ListIndex:LedgerMapList:##IdVar
 
-		2703: If: $$IsEmpty:##HsnCodeVar		
-			2800: INSERT COLLECTION OBJECT 		: LEDGERENTRIES
-			2900: SET VALUE 	: LedgerName 		: ##TallyNameVar
-			3000: SET VALUE 	: IsDeemedPositive 	: if $amount > 0 then Yes else No
-			3100: SET VALUE 	: Amount 			: $$AsAmount:$amount * -1 
-			3200: SET TARGET 	: ..					
-		3400: Else				
-			1800a: Set: ListIdxVar: $$ListIndex:StockItemMapList:##HsnCodeVar
-			1900a: Set: TallyStockItemVar: ##StockItemMapList[##ListIdxVar]  		
-			2000a: If: $$IsEmpty:##TallyStockItemVar 
-				2100a: Set: MapItemTypeVar : "StockItem"
-				2200a: Alter: AP Map Tally Name
-				2300a: If: Not $$IsEmpty:##TallyStockItemVar
-					2400a: Set: StockItemMapList[##ListIdxVar]: ##TallyStockItemVar
-					2500a: List Add:StockItemAddList:##HsnCodeVar:##TallyStockItemVar
-				2600a: End if
-			2700a: End If
-
-			3600: INSERT COLLECTION OBJECT 			: INVENTORYENTRIES
-			3700: SET VALUE 	: StockItemName 	: ##TallyStockItemVar
-			3800: SET VALUE 	: IsDeemedPositive 	: No
-			3900: SET VALUE 	: ActualQty 		: ($$TgtObject:$$AsQty:@qty)
-			4000: SET VALUE 	: BilledQty 		: ($$TgtObject:$$AsQty:@qty)
-			4100: SET VALUE 	: Rate 				: ($$TgtObject:$$AsRate:@rate)
-			4200: SET VALUE 	: Amount 			: $$AsAmount:$taxable_amount
-			4300: SET VALUE 	: GstHsnName		: $hsn_code
-			4400: Set Value		: GstHsnInferApplicability : "Specify Details Here"
-			4500: Set Value		: GstRateInferApplicability : "Specify Details Here"
-			4600: Set Value		: GstOvrdnTaxability : "Taxable"			
-			4800: INSERT COLLECTION OBJECT 			: ACCOUNTING ALLOCATIONS
-			4900: SET VALUE 	: LedgerName 		: ##TallyNameVar
-			5000: SET VALUE 	: IsDeemedPositive 	: No
-			5100: SET VALUE 	: Amount 			: $$AsAmount:$amount * -1
-			5200: SET TARGET 	: ..
-			5300: Insert Collection Object: RATEDETAILS
-			5400: Set Value: GSTRATEDUTYHEAD : "CGST"
-			5500: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-			5600: Set Value: GSTRATE: ($tax_ratio / 2)
-			5700: Set Target: ..
-			5800: Insert Collection Object: RATEDETAILS
-			5900: Set Value: GSTRATEDUTYHEAD : "SGST/UTGST"
-			6000: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-			6100: Set Value: GSTRATE: ($tax_ratio / 2)
-			6200: Set Target: ..	
-			6300: Insert Collection Object: RATEDETAILS
-			6400: Set Value: GSTRATEDUTYHEAD : "IGST"
-			6500: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-			6600: Set Value: GSTRATE: $tax_ratio
-			6700: Set Target: ..		
-			6800: Insert Collection Object: RATEDETAILS
-			6900: Set Value: GSTRATEDUTYHEAD : "CESS"
-			7000: Set Value: GSTRATEVALUATIONTYPE : $$SysName:NotApplicable			
-			7100: Set Target: ..		
-			7200: Insert Collection Object: RATEDETAILS
-			7300: Set Value: GSTRATEDUTYHEAD : "STATE CESS"
-			7400: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
-			7500: Set Target: ...
-
-		7600: End If
-		7700: Set: HsnCodeVar:""
-	8000: End Walk
-
-	20000: SET VALUE   	: PersistedView 	: ##SVViewName
-	20100: CREATE TARGET
 	
+	e10: If: $mode = "ACCOUNT" Or $mode = "GST"
+	e20: 	SET  	: SVViewName 			: $$SysName:AcctgVchView
+	e30: Else
+	e40: 	SET		: SVViewName 			: $$SysName:InvVchView
+	e50: End If
+	200: NEW OBJECT : Voucher	
+	300: SET VALUE 	: Date 					: $date	
+	400: SET VALUE 	: VoucherTypeName 		: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
+	410: SET VALUE 	: VoucherNumber			: $voucher_no
+	500: SET VALUE 	: PartyLedgerName 		: $party_name
+	600: SET VALUE 	: IsInvoice 			: No
+	700: If: $mode = "INVENTORY"
+	800: 	SET VALUE 	: IsInvoice 			: Yes	
+	900: End If
+	1000: If: Not $$IsEmpty:$ref_no
+	1100: 	SET VALUE 	: Reference			: $ref_no	
+	1200: End If 
+	1201: If: ($mode = "INVENTORY" Or $mode = "GST") And +
+			  ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or +
+				$base_voucher_type = "CREDIT_NOTE" Or $base_voucher_type = "DEBIT_NOTE" )
+	1300: 	SET VALUE 	: GstRegistrationType		: "Unregistered/Consumer"
+	1400: 	If:  Not $$IsEmpty:$gst_reg_type
+	1500:  		SET		    : GstRegTypeVar			: $gst_reg_type	
+	1600:  		SET VALUE 	: GstRegistrationType	: @PartyGstRegType
+	1700: 	End If
+	1701: End If
+	1800: If: NOt $$IsEmpty:$gst_no
+	1900: 	Set Value	: PartyGstIn			: $gst_no
+	2000: End If
+;	2100: SET VALUE 	: BasicBuyerName 		: "Cash"	;; get it from first item of ac txn
+	2100: SET VALUE 	: BasicBuyerName		: $party_name	
+	2200: SET VALUE 	: PartyMailingName		: $party_name
+	2300: SET VALUE 	: StateName				: @@GetCompanyStateName
+	2400: SET VALUE 	: CountryOfResidence	: @@GetCompanyCountryName
+	2500: If: Not $$IsEmpty:$gst_location
+		2600: 	SET VALUE 	: PlaceOfSupply			: $gst_location
+	2700: Else	
+		2800: SET VALUE 	: PlaceOfSupply			: @@GetCompanyStateName
+	2900: End If
+
+	e100: If: Not $$IsEmpty:$description
+		e200: 	SET VALUE 	: NARRATION			: $description		
+	e300: End If
+	e400: SET VALUE 	: EFFECTIVEDATE		: $eff_date
 	
-	
+	3000: Walk Collection: ac_trns
+		3100: Set: IdVar: $account_id  	
+		3200: Set: ListIdxVar: $$ListIndex:LedgerMapList:##IdVar
+
+		3201: If: ##ListIdxVar = 0
+		3202:   Msg Box: "Account Not Available": "Account Id: "+($$string:$account_id) + "\n\n VoucherNo: " + $voucher_no + "\n\nVoucher skipped"
+		3203:   Increment: SkippedVch
+		3204:   Set: CreateVch: No
+		3205: 	Break
+		3206: End If
+		3300: Set: TallyNameVar: ##LedgerMapList[##ListIdxVar]  		
+		
+		3400: If: $$IsEmpty:##TallyNameVar 
+			3500: Set: MapItemTypeVar : "Ledger"
+			3600: Alter: AP Map Tally Name
+			3700: If: Not $$IsEmpty:##TallyNameVar
+				3800: Set: LedgerMapList[##ListIdxVar]: ##TallyNameVar
+				3900: List Add:LedgerAddList:##IdVar:##TallyNameVar
+			4000: End if
+		4100: End If
+		
+		4200: Set: HsnCodeVar: $hsn_code
+		4300: If: $$IsEmpty:##HsnCodeVar		
+			4400: INSERT COLLECTION OBJECT 			: LEDGERENTRIES
+			4500: SET VALUE 	: LedgerName 		: ##TallyNameVar
+			4600: SET VALUE 	: IsDeemedPositive 	: if $amount > 0 then Yes else No
+			4700: SET VALUE 	: Amount 			: $$AsAmount:$amount * -1 
+			4800: SET TARGET 	: ..					
+		4900: Else				
+			5000: Set: ListIdxVar: $$ListIndex:StockItemMapList:##HsnCodeVar
+			5100: Set: TallyStockItemVar: ##StockItemMapList[##ListIdxVar]  		
+			5200: If: $$IsEmpty:##TallyStockItemVar 
+				5300: Set: MapItemTypeVar : "StockItem"
+				5400: Alter: AP Map Tally Name
+				5500: If: Not $$IsEmpty:##TallyStockItemVar
+					5600: Set: StockItemMapList[##ListIdxVar]: ##TallyStockItemVar
+					5700: List Add:StockItemAddList:##HsnCodeVar:##TallyStockItemVar
+				5800: End if
+			5900: End If
+
+			6000: INSERT COLLECTION OBJECT 			: INVENTORYENTRIES
+			6100: SET VALUE 	: StockItemName 	: ##TallyStockItemVar
+			6200: SET VALUE 	: IsDeemedPositive 	: No
+			6300: SET VALUE 	: ActualQty 		: ($$TgtObject:$$AsQty:@qty)
+			6400: SET VALUE 	: BilledQty 		: ($$TgtObject:$$AsQty:@qty)
+			6500: SET VALUE 	: Rate 				: ($$TgtObject:$$AsRate:@rate)
+			6600: SET VALUE 	: Amount 			: $$AsAmount:$taxable_amount
+			6700: SET VALUE 	: GstHsnName		: $hsn_code
+			6800: Set Value		: GstHsnInferApplicability : "Specify Details Here"
+			6900: Set Value		: GstRateInferApplicability : "Specify Details Here"
+			7000: Set Value		: GstOvrdnTaxability : "Taxable"			
+			7100: INSERT COLLECTION OBJECT 			: ACCOUNTING ALLOCATIONS
+			7200: SET VALUE 	: LedgerName 		: ##TallyNameVar
+			7300: SET VALUE 	: IsDeemedPositive 	: No
+			7400: SET VALUE 	: Amount 			: $$AsAmount:$amount * -1
+			7500: SET TARGET 	: ..
+			7600: Insert Collection Object: RATEDETAILS
+			7700: Set Value: GSTRATEDUTYHEAD : "CGST"
+			7800: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+			7900: Set Value: GSTRATE: ($tax_ratio / 2)
+			8000: Set Target: ..
+			9100: Insert Collection Object: RATEDETAILS
+			9200: Set Value: GSTRATEDUTYHEAD : "SGST/UTGST"
+			9300: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+			9400: Set Value: GSTRATE: ($tax_ratio / 2)
+			9500: Set Target: ..	
+			9600: Insert Collection Object: RATEDETAILS
+			9700: Set Value: GSTRATEDUTYHEAD : "IGST"
+			9800: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+			9900: Set Value: GSTRATE: $tax_ratio
+			10000: Set Target: ..		
+			10100: Insert Collection Object: RATEDETAILS
+			10200: Set Value: GSTRATEDUTYHEAD : "CESS"
+			10300: Set Value: GSTRATEVALUATIONTYPE : $$SysName:NotApplicable			
+			10400: Set Target: ..		
+			10500: Insert Collection Object: RATEDETAILS
+			10600: Set Value: GSTRATEDUTYHEAD : "STATE CESS"
+			10700: Set Value: GSTRATEVALUATIONTYPE : "Based on Value"			
+			10800: Set Target: ...
+
+		109000: End If
+		110000: Set: HsnCodeVar:""
+	11100: End Walk
+
+	11200: SET VALUE   	: PersistedView 	: ##SVViewName
+	11300: If: ##CreateVch
+	11400: 		CREATE TARGET
+	11500: End if
+
 	
 [Function: AP Update Map]
 	Variable: LpIdx: Number: 1
@@ -321,11 +241,11 @@
 	20: alter target
 
 [Function: AP Map Tally Name Submit]		
-001: If: ##MapItemTypeVar = "Ledger"
-	002: Set: TallyNameVar:#APMapTallyName
-003: Else
-	004: Set: TallyStockItemVar:#APMapTallyName
-005: End If
+	100: If: ##MapItemTypeVar = "Ledger"
+		200: Set: TallyNameVar:#APMapTallyName
+	300: Else
+		400: Set: TallyStockItemVar:#APMapTallyName
+	500: End If
 	
 
 [Report: AP Map Tally Name]
@@ -356,7 +276,7 @@
 	Local: Line: AP Map Info Line 2 : Local	:	Field	:	Medium Prompt	: Info		: "Description"
 	Local: Line: AP Map Info Line 2 : Local	:	Field	:	Name Field		: Info		: $APName
 	
-[Part: Ap Map Info1]
+[Part: Ap Map Info 1]
 	Lines: Ap Map Info Line 1, Ap Map Info Line 2, AP Map Info Line3
 	ObjectEx: (Company, ##SVCurrentCompany).ApLedgers[1, $APId=##IdVar]
 		
@@ -402,23 +322,3 @@
 			Show Table: Always
 			Add: Key: Create Stock Item
 			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	

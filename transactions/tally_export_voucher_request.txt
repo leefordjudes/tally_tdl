@@ -1,23 +1,20 @@
 [Collection: TallyExportVoucher Data Source]
 	Data Source		: HTTP JSON: @@APHost: UTF8
+	JSON Object Path: "data:1"
 	RemoteRequest	: TallyExportVoucher Rpc Request: UTF8
 	Export Header	: "organization:" + @@APOrganization
 	Export Header	: "auth_token:" + @@APAuthToken	
-	
-
 ;;----------------------------RPC Request Start---------------------	
-
 [Report: TallyExportVoucher Rpc Request]
 	Form: TallyExportVoucher Rpc Request
 	Plain JSON: Yes
-	
+		
 [Form: TallyExportVoucher Rpc Request]
 	Delete: XMLTag
 	Full Object: Yes
 	Belongs To: Yes
 	Part: TallyExportVoucher Rpc Request Method, TallyExportVoucher Rpc Request Data
 	
-
 [Part: TallyExportVoucher Rpc Request Method]
 	Line: TallyExportVoucher Rpc Request Method
 	Scroll: Vertical
@@ -43,19 +40,14 @@
 			[Field: TallyExportVoucher Request From Date]
 				Type: String
 				JSONTag: "from_date"	
-				Set as: "2025-09-27"
-;				Set as: ##TxnVchFromDate
-;				Set as: @@ExpVchFromDate
+				Set as: ##TxnVchFromDate
 			[Field: TallyExportVoucher Request To Date]
 				Type: String
 				JSONTag: "to_date"
-				Set as: "2025-09-27"
-;				Set as: ##TxnVchToDate
-;				Set as: @@ExpVchToDate
+				Set as: ##TxnVchToDate
+				
 			[Field: TallyExportVoucher Request Voucher Type Id]
 				Type: Number
 				JSONTag: "voucher_type_id"
-				Set as: 5
-;				Set as: ##VTypeIdVar
-				
+				Set as: ##TxnVchTypeId				
 ;;----------------------------RPC Request End---------------------	
