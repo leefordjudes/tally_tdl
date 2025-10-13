@@ -1,11 +1,12 @@
 [Report: AP Tally Export Master Request]
-	Use: Rpc Request
+	Use: Rpc Request	
 	Local: Field: Rpc Request Method: Set as: "tally_export_master"
 
 [Collection: AP Tally Export Master Data Source]
 	Use				: Rpc Data Source
 	RemoteRequest	: AP Tally Export Master Request: UTF8
 	JSON Object Path: "data:1"
+	Keep Source		:().
 	
 [Function: AP Download Masters ]
 	Variable: ProgressCount		: Number		
@@ -22,10 +23,12 @@
 	
 	010 : Query Box: "Do you want to download masters" : Yes: No
 	020	: 	If	: $$LastResult			
+		sb : START BLOCK
 		021: Set Object: (Company, ##SVCurrentCompany).
 		021a: LIST FILL : LedgerMapList 		: APLedgers 		: $APId 		: $APTallyName
 		021b: LIST FILL : StockItemMapList 		: APStockItems 		: $APHsnCode 	: $APTallyName
 		021c: LIST FILL : VoucherTypeMapList 	: APVoucherTypes 	: $APId 		: $APTallyName
+		eb : END BLOCK	
 		022: START PROGRESS	: 4:"Downloading":"Masters"		
 		030: Walk Collection: AP Tally Export Master Data Source 			
 			040: SET TARGET	: (Company, ##SVCurrentCompany).
@@ -94,7 +97,7 @@
 			392: INCREMENT		: ProgressCount			
 			400: Alter Target
 			401: END PROGRESS
-		410: End Walk
+		410: End Walk		
 	420	:	End If
 
 
