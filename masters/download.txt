@@ -6,7 +6,6 @@
 	Use				: Rpc Data Source
 	RemoteRequest	: AP Tally Export Master Request: UTF8
 	JSON Object Path: "data:1"
-	Keep Source		:().
 	
 [Function: AP Download Masters ]
 	Variable: ProgressCount		: Number		
@@ -21,84 +20,89 @@
 
 	Local Formula: Lc: $$ListCount:LedgerMapList
 	
-	010 : Query Box: "Do you want to download masters" : Yes: No
-	020	: 	If	: $$LastResult			
-		sb : START BLOCK
-		021: Set Object: (Company, ##SVCurrentCompany).
-		021a: LIST FILL : LedgerMapList 		: APLedgers 		: $APId 		: $APTallyName
-		021b: LIST FILL : StockItemMapList 		: APStockItems 		: $APHsnCode 	: $APTallyName
-		021c: LIST FILL : VoucherTypeMapList 	: APVoucherTypes 	: $APId 		: $APTallyName
-		eb : END BLOCK	
-		022: START PROGRESS	: 4:"Downloading":"Masters"		
-		030: Walk Collection: AP Tally Export Master Data Source 			
-			040: SET TARGET	: (Company, ##SVCurrentCompany).
-			041: SET		: ProgressCount		: 1
-			042: Set: LpIdx: 1			
-			050: Walk Collection: accounts
-				050a: If: $$ListFind:LedgerMapList:$$String:$id
-					050b: Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name
-				050h: Else				
-					060: INSERT COLLECTION OBJECT   : APLedgers
-					070: SET VALUE  : APId   		: $id
-					080: SET VALUE  : APName 		: $name
-					090: SET VALUE  : APAccountType	: $account_type_name
-					100: ReSET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
-					110: Set Target: .. 				
-				050z: End If							
-				110a: Increment: LpIdx
-			120: End Walk			
-			121: SHOW PROGRESS	: ##ProgressCount
-			122: INCREMENT		: ProgressCount
+	100: Query Box: "Do you want to download masters" : Yes: No
+	200: If: $$LastResult			
+	300: 	START BLOCK
+	400: 		Set Object: (Company, ##SVCurrentCompany).
+	500: 		LIST FILL : LedgerMapList 		: APLedgers 		: $APId 		: $APTallyName
+	600: 		LIST FILL : StockItemMapList 	: APStockItems 		: $APHsnCode 	: $APTallyName
+	700: 		LIST FILL : VoucherTypeMapList 	: APVoucherTypes 	: $APId 		: $APTallyName
+	800: 	END BLOCK	
+	900: 	START PROGRESS	: 4:"Downloading":"Masters"		
+	1000: 	Walk Collection: AP Tally Export Master Data Source 			
+	1100: 		SET TARGET	: (Company, ##SVCurrentCompany).
+	1200: 		SET		: ProgressCount		: 1
+	
+	1300: 		Set: LpIdx: 1		
+	1400: 		Walk Collection: accounts
+	1500: 			If: $$ListFind:LedgerMapList:$$String:$id
+	1600: 				Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name
+	1700: 			Else				
+	1800: 				INSERT COLLECTION OBJECT   : APLedgers
+	1900: 				SET VALUE  : APId   		: $id
+	2000: 				SET VALUE  : APName 		: $name
+	2100: 				SET VALUE  : APAccountType	: $account_type_name
+	2200: 				RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	2300: 				Set Target: .. 				
+	2400: 			End If							
+	2500: 			Increment: LpIdx
+	2600: 		End Walk			
+
+	2700: 		SHOW PROGRESS	: ##ProgressCount
+	2800: 		INCREMENT		: ProgressCount			
+
+	2900: 		Set: LpIdx: 1	
+	3000: 		Walk Collection: hsns
+	3100: 			If: $$ListFind:StockItemMapList:$hsn_code
+	3200: 				Modify Object : (Company, ##SVCurrentCompany).ApStockItems[1, $APHsnCode=$hsn_code].APName : $name
+	3300: 			Else	
+	3400: 				INSERT COLLECTION OBJECT   : APStockItems
+	3500: 				SET VALUE  : APHsnCode 	: $hsn_code
+	3600: 				SET VALUE  : APName		: $name
+	3700: 				RESET VALUE  : APTallyName  ;; 	: $$SysName:NotApplicable
+	3800: 				Set Target: .. 	
+	3900: 			End If	
+	4000: 			Increment: LpIdx
+	4100: 		End Walk		
+	
+	4200: 		SHOW PROGRESS	: ##ProgressCount
+	4300: 		INCREMENT		: ProgressCount			
 			
-			122a: Set: LpIdx: 1
-			140: Walk Collection: hsns
-				140a: If: $$ListFind:StockItemMapList:$hsn_code
-					140b: Modify Object : (Company, ##SVCurrentCompany).ApStockItems[1, $APHsnCode=$hsn_code].APName : $name
-				140h: Else	
-					150: INSERT COLLECTION OBJECT   : APStockItems
-					160: SET VALUE  : APHsnCode 	: $hsn_code
-					170: SET VALUE  : APName		: $name
-;					180: SET VALUE  : APTallyName	: "MOX REDIMIX 125MG SYRUP 30ML"
-					180: RESET VALUE  : APTallyName  ;; 	: $$SysName:NotApplicable
-					190: Set Target: .. 	
-				190z: End If	
-				190a: Increment: LpIdx
-			200: End Walk				
-			201: SHOW PROGRESS	: ##ProgressCount
-			202: INCREMENT		: ProgressCount			
-			
-;			202a: Set: LpIdx: 1
-;			220: Walk Collection: units
-;				230: INSERT COLLECTION OBJECT   : APUnits
-;				240: SET VALUE  : APId   : $id
-;				250: SET VALUE  : APName : $name
-;				260: SET VALUE  : APUqc  : $uqc	
-;				270: RESET VALUE  : APTallyName ;; : $$SysName:NotApplicable
-;				280: Set Target: .. 
-;				280a: Increment: LpIdx
-;			290: End Walk				
-;			291: SHOW PROGRESS	: ##ProgressCount
-;			292: INCREMENT		: ProgressCount			
-			
-			320: Walk Collection: voucher_types
-				320a: If: $$ListFind:VoucherTypeMapList:$$String:$id
-					320b: Modify Object : (Company, ##SVCurrentCompany).ApVoucherTypes[1, $APId=$id].APName : $name
-				320h: Else
-				330: INSERT COLLECTION OBJECT   : APVoucherTypes
-				340: SET VALUE  : APId   		: $id
-				350: SET VALUE  : APName 		: $name
-				360: SET VALUE  : APVoucherType	: $base_type
-				370: RESET VALUE  : APTallyName ;; 	: $$SysName:NotApplicable
-				380: Set Target: .. 
-				380z: End If	
-				380a: Increment: LpIdx
-			390: End Walk				
-			391: SHOW PROGRESS	: ##ProgressCount
-			392: INCREMENT		: ProgressCount			
-			400: Alter Target
-			401: END PROGRESS
-		410: End Walk		
-	420	:	End If
+;	4400: 		Set: LpIdx: 1
+;	4500: 		Walk Collection: units
+;	4600: 			INSERT COLLECTION OBJECT   : APUnits
+;	4700: 			SET VALUE  : APId   : $id
+;	4800: 			SET VALUE  : APName : $name
+;	4900: 			SET VALUE  : APUqc  : $uqc	
+;	5000: 			RESET VALUE  : APTallyName ;; : $$SysName:NotApplicable
+;	5100: 			Set Target: .. 
+;	5200: 			Increment: LpIdx
+;	5300: 		End Walk				
+
+;	5400: 		SHOW PROGRESS	: ##ProgressCount
+;	5500: 		INCREMENT		: ProgressCount			
+	
+	5600: 		Set: LpIdx: 1
+	5700: 		Walk Collection: voucher_types
+	5800: 			If: $$ListFind:VoucherTypeMapList:$$String:$id
+	5900: 				Modify Object : (Company, ##SVCurrentCompany).ApVoucherTypes[1, $APId=$id].APName : $name
+	6000: 			Else
+	6100: 				INSERT COLLECTION OBJECT   : APVoucherTypes
+	6200: 				SET VALUE  : APId   		: $id
+	6300: 				SET VALUE  : APName 		: $name
+	6400: 				SET VALUE  : APVoucherType	: $base_type
+	6500: 				RESET VALUE  : APTallyName ;; 	: $$SysName:NotApplicable
+	6600: 				Set Target: .. 
+	6700: 			End If	
+	6800: 			Increment: LpIdx
+	6900: 		End Walk				
+	
+	7000: 		SHOW PROGRESS	: ##ProgressCount
+	7100: 		INCREMENT		: ProgressCount			
+	7200: 		Alter Target
+	7300: 		END PROGRESS
+	7400: 	End Walk		
+	7500:End If
 
 
 

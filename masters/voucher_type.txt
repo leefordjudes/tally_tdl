@@ -1,7 +1,7 @@
 [Collection: TallyVoucherTypes]
 	Type		: Voucher Type
 	Title		: "Tally Voucher Types"
-	Format		: $Name, 20	
+	Format		: $Name, 40	
 	
 [Report: AP Voucher Type Map]
 	Use: AP Unit Map

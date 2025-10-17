@@ -12,7 +12,7 @@
 [Collection: TallyUnits]
 	Type: Unit
 	Title: "Tally Units"
-	Format	: $Name, 20
+	Format	: $Name, 30
 
 [Report: AP Unit Map]
 	Title: "Auditplus Unit Mapping"
@@ -75,6 +75,7 @@
 		[Field: AP Tally Name Field]
 			Use: NameField
 			Border  : Thin Left
+			Width	: 40
 			Storage	: APTallyName
 			Show Table: Always			
 			Table: TallyUnits, NotApplicable			

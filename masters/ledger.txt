@@ -1,7 +1,7 @@
 [Collection: TallyLedgers]
 	Type: Ledger
 	Title: "Tally Ledgers"
-	Format	: $Name, 20
+	Format	: $Name, 40
 	
 [Report: AP Ledger Map]
 	Use: AP Unit Map

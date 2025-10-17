@@ -29,11 +29,15 @@
 
 
 [Collection: Rpc Data Source]
-	;Local Formula	: Host	:	@@APHost + "/rest/rpc"
-	Data Source		: HTTP JSON: @@APHost: UTF8
+	Data Source		: HTTP JSON: @@APHost: UTF8	
 	RemoteRequest	: Rpc Request: UTF8
 	Export Header	: "organization:" + @@APOrganization
 	Export Header	: "auth_token:" + @@APAuthToken
+
+;	Data Source		: HTTP JSON: "https://velavanmedical.auditplusdb.com/rest/rpc": UTF8
+;	RemoteRequest	: Rpc Request: UTF8
+;	Export Header	: "organization:" + "velavanmedical"
+;	Export Header	: "auth_token:" + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwib3JnIjoidmVsYXZhbm1lZGljYWwiLCJpc3UiOjE3NjA1MjMwNjAsImV4cCI6MTc2MzExNTA2MH0.ff7dIZEqsJIxSf0tLGD9ZZysGr_zUeoMSXrZkspfdLw"
 
 ;;----------------------------RPC Request Start---------------------	
 
