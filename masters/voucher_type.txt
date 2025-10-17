@@ -1,7 +1,7 @@
 [Collection: TallyVoucherTypes]
-	Type: Voucher Type
-	Title: "Tally Voucher Types"
-	Format	: $Name, 20
+	Type		: Voucher Type
+	Title		: "Tally Voucher Types"
+	Format		: $Name, 40	
 	
 [Report: AP Voucher Type Map]
 	Use: AP Unit Map
@@ -25,7 +25,8 @@
 
 
 [Collection: APVoucherTypes]
-	Type	: APVoucherTypes:Company
+	Type		: APVoucherTypes	:	Company
+	Child of    : ##SVCurrentCompany
 
 [Function: AP Delete ALL Voucher Type]
 	010: Set Object: (Company, ##SVCurrentCompany).	 

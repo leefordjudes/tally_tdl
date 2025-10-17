@@ -6,9 +6,11 @@
 [Menu: Auditplus Integration]
 	
 	Key Item: "Masters"				: M : Menu	:	AP Masters
-	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
-	Key Item: "Txn Configurations"	: X : Alter	:	AP Txn Configuration
+;	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
+;	Key Item: "Transactions"		: T : Display:	AP SaveVoucher
+	Key Item: "Transactions"		: T : Alter	:   AP Txn Configuration
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
+	Key Item: "Http Test" 			: H	: Call	: 	HttpTest
 
 
 [System: Formula]
@@ -21,16 +23,21 @@
 [Include: company_details.txt]
 [Include: configuration/configuration.txt]
 [Include: masters/masters.txt]
-[Include: transactions/transaction_configuration.txt]
 [Include: transactions/transactions.txt]
+[Include: transactions/transaction_configuration.txt]
+[Include: transactions/httptest.txt]
 
 
 [Collection: Rpc Data Source]
-	;Local Formula	: Host	:	@@APHost + "/rest/rpc"
-	Data Source		: HTTP JSON: @@APHost: UTF8
+	Data Source		: HTTP JSON: @@APHost: UTF8	
 	RemoteRequest	: Rpc Request: UTF8
 	Export Header	: "organization:" + @@APOrganization
 	Export Header	: "auth_token:" + @@APAuthToken
+
+;	Data Source		: HTTP JSON: "https://velavanmedical.auditplusdb.com/rest/rpc": UTF8
+;	RemoteRequest	: Rpc Request: UTF8
+;	Export Header	: "organization:" + "velavanmedical"
+;	Export Header	: "auth_token:" + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwib3JnIjoidmVsYXZhbm1lZGljYWwiLCJpc3UiOjE3NjA1MjMwNjAsImV4cCI6MTc2MzExNTA2MH0.ff7dIZEqsJIxSf0tLGD9ZZysGr_zUeoMSXrZkspfdLw"
 
 ;;----------------------------RPC Request Start---------------------	
 

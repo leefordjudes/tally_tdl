@@ -1,0 +1,74 @@
+[Collection: TallyExportVoucher Data Source]
+	Data Source		: HTTP JSON: @@APHost: UTF8
+	JSON Object Path: "data:1"
+	RemoteRequest	: TallyExportVoucher Rpc Request: UTF8
+	Export Header	: "organization:" + @@APOrganization
+	Export Header	: "auth_token:" + @@APAuthToken	
+;;----------------------------RPC Request Start---------------------	
+[Report: TallyExportVoucher Rpc Request]
+	Form: TallyExportVoucher Rpc Request
+	Plain JSON: Yes
+		
+[Form: TallyExportVoucher Rpc Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: TallyExportVoucher Rpc Request Method, TallyExportVoucher Rpc Request Data
+	
+[Part: TallyExportVoucher Rpc Request Method]
+	Line: TallyExportVoucher Rpc Request Method
+	Scroll: Vertical
+	
+	[Line: TallyExportVoucher Rpc Request Method]
+		Field: TallyExportVoucher Rpc Request Method
+			
+			[Field: TallyExportVoucher Rpc Request Method]
+				Use: Name Field
+				JSONTag: "method"
+				Set as: "tally_export_voucher"
+				
+[Part: TallyExportVoucher Rpc Request Data]
+	Line: TallyExportVoucher Request Data
+	JSONTag: "data"
+	Scroll: Vertical
+
+	[Line: TallyExportVoucher Request Data]		
+		Field: TallyExportVoucher Request From Date
+		Field: TallyExportVoucher Request To Date
+		Field: TallyExportVoucher Request Voucher Type Id
+		Field: TallyExportVoucher Request Account Only
+		Field: TallyExportVoucher Request B2C Sale Daywise
+			
+			[Field: TallyExportVoucher Request From Date]
+				YR: $$YearOfDate:##TxnVchFromDate
+				ZM: $$ZeroFill:($$MonthOfDate:##TxnVchFromDate):2
+				ZD: $$ZeroFill:($$DayofDate:##TxnVchFromDate):2
+				Type: String
+				JSONTag: "from_date"	
+				Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+				
+			[Field: TallyExportVoucher Request To Date]
+				YR: $$YearOfDate:##TxnVchToDate
+				ZM: $$ZeroFill:($$MonthOfDate:##TxnVchToDate):2
+				ZD: $$ZeroFill:($$DayofDate:##TxnVchToDate):2
+				Type: String
+				JSONTag: "to_date"
+				Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+				
+			[Field: TallyExportVoucher Request Voucher Type Id]
+				Type		: Number
+				JSONTag		: "voucher_type_id"
+				Set as		: ##TxnVchTypeId				
+			
+			[Field: TallyExportVoucher Request Account Only]
+				Type 		: Logical
+				JSONTag     : "account_only"
+				Set As		: If (Not $$IsEmpty:##TxnAccountOnly) And (##TxnAccountOnly = Yes) Then true Else false
+			
+			[Field: TallyExportVoucher Request B2C Sale Daywise]
+				Type 		: Logical
+				JSONTag     : "b2c_sale_daywise"
+				Set As		: If (Not $$IsEmpty:##TxnB2CSaleDaywise) And (##TxnB2CSaleDaywise = Yes) Then true Else false
+								
+				
+;;----------------------------RPC Request End---------------------	

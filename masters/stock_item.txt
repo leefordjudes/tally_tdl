@@ -1,7 +1,7 @@
 [Collection: TallyStockItems]
 	Type: Stock Item
 	Title: "Tally Stock Items"
-	Format	: $Name, 20
+	Format	: $Name, 50
 
 [Report: AP Stock Item Map]
 	Use: AP Unit Map
@@ -15,20 +15,21 @@
 	Local: Line: AP Unit Map Title : Delete : Field : AP Uqc Field 
 	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Info: "HSN Code"	
 	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Info: "Item Name"
-	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Width: 100
+	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Width: 80
 	Local: Line: AP Unit Map Title: Local: Field : AP Tally Name Field	: Info: "Tally Stock Item"
 		
 	Local: Line: AP Unit Map : Local: Field	: AP Id Field 	: Info: $APHsnCode
 	Local: Line: AP Unit Map : Local: Field	: AP Name Field : Info: $APName
-	Local: Line: AP Unit Map : Local: Field : AP Name Field	: Width: 100
+	Local: Line: AP Unit Map : Local: Field : AP Name Field	: Width: 80
 	Local: Line: AP Unit Map : Delete : Field : AP Uqc Field 
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyStockItems,NotApplicable
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Add: Key: Create Stock Item
 
 [Collection: APStockItems]
-	Type: APStockItems:Company
-	Filter		: NOT FilterMapped
+	Type		: APStockItems	:	Company
+;	Filter		: NOT FilterMapped
+	Child Of	: ##SVCurrentCompany
 
 [Function: AP Delete ALL Stock Item]
 	002: Set Object: (Company, ##SVCurrentCompany).	 
