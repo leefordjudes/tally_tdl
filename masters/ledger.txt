@@ -9,6 +9,7 @@
 	
 	Local: Form: APUnitMap: Delete: Buttons
 	Local: Form: APUnitMap: Add: Buttons: AP Delete All Ledger
+	Local: Form: APUnitMap: Add: Buttons: AP Create All Ledger
 	
 	Local: Part: APUnitMap: Repeat: APUnitMap: AP Ledgers
 	
@@ -36,9 +37,53 @@
 	030: Walk Collection: APLedgers
 		040: Delete Collection Object : APLedgers
 	050: End Walk
-	060: Alter Target	
+	060: Alter Target
+	
+[Function: AP Test Fun]
+	010: Set Object: (Company, ##SVCurrentCompany).	 
+	020: Set Target
+;	030: Walk Collection: APLedgers
+	040:	Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $ApId=1].APTallyName: "Cash"
+;	050: End Walk
+	060: Alter Target
+		
+[Function: AP Create ALL Ledger]
+	Variable: i : Number: 1
+	Variable: LedId: Number
+	
+	LIST VARIABLE 	: Tally Ledger Map List 		: String
+	
+	100: Set Object: (Company, ##SVCurrentCompany).	 
+	101: LIST FILL : TallyLedgerMapList : TallyLedgers : $name : $parent
+	200: Set Target
+	300: Walk Collection: APLedgers	
+	400: 	If: $$IsEmpty:$APTallyName
+	500: 		Set: LedId: $ApId
+;	500: 		Msg Box: "Not Mapped "+($$String:##i) :$ApName
+	600: 		If: $$ListFind:TallyLedgerMapList:$$String:$ApName
+	700: 			Msg Box: $ApName: "Tally Account Found,"+($$String:##LedId)+" Map It"
+;	701:			Set Value: APTallyName : $ApName;##TallyLedgerMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
+	702:			Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $ApId=##LedId].APTallyName : $APName
+;	800:  		Else
+;	900:			Msg Box: $ApName: "Tally Account Not Found, Create & Map It"
+   1000:		End if
+   1100:	End if
+   1200:    Increment: i
+   1300: 	If: ##i = 10
+   1301: 		Alter Target
+   1400: 		Break
+   1500: 	End if
+   1600: End Walk
+   1601: Msg Box: "walk":"end"
+   1700: Alter Target
 	
 [Button: AP Delete All Ledger]
 	Key: F4
 	Action: Call : AP Delete ALL Ledger
 	Title: "Delete All"	
+
+[Button: AP Create All Ledger]
+	Key: F5
+;	Action: Call : AP Create All Ledger
+	Action: Call:  AP Test Fun
+	Title: "Create Ledgers"		

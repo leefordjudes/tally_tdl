@@ -83,7 +83,7 @@
 	
 	Local Formula: lc: $$ListIndex:LedgerMapList:##IdVar
 
-	
+	010: START BATCH POST : 100
 	100:  If: ##TxnAccountOnly = Yes Or $mode = "ACCOUNT" Or $mode = "GST"
 	200:  	SET  	: SVViewName 			: $$SysName:AcctgVchView
 	300:  Else
@@ -224,6 +224,7 @@
 	12100: 		Increment: CreatedVch
 	12200: 		CREATE TARGET
 	12300: End if
+	12400: END BATCH POST
 
 	
 [Function: AP Update Map]

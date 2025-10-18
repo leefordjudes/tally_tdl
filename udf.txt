@@ -11,19 +11,22 @@
 	AP HsnCode				: 	String		: 25008
 	AP Voucher Type			:	String		: 25009
 	
-	AP Txn Voucher Type		: 	String		: 25010
+	Ap Gst Reg Type			:   String		: 25010
+	Ap Gst Location			:   String		: 25011
+	Ap Gst No				:   String		: 25012
+	Ap Pan No				:   String		: 25013
+	Ap Address				:   String		: 25014
+	Ap State				:   String		: 25015
+	Ap Country				:   String		: 25016
 	
-	
-	AP Txn From Date		: 	String		: 25011
-	AP Txn To Date			: 	String		: 25012
-				
+;	AP Txn Voucher Type		: 	String		: 25010		
+;	AP Txn From Date		: 	String		: 25011
+;	AP Txn To Date			: 	String		: 25012
 
 	AP Id					: 	Number		: 25001
-	
 		
 	AP Units				:	Aggregate	: 25001
 	AP Stock Items			:	Aggregate	: 25002
 	AP Ledgers				:	Aggregate	: 25003
 	AP VoucherTypes			:	Aggregate	: 25004
-	
-	
+	AP Groups				:	Aggregate	: 25005

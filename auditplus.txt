@@ -10,7 +10,7 @@
 ;	Key Item: "Transactions"		: T : Display:	AP SaveVoucher
 	Key Item: "Transactions"		: T : Alter	:   AP Txn Configuration
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
-	Key Item: "Http Test" 			: H	: Call	: 	HttpTest
+;	Key Item: "Http Test" 			: H	: Call	: 	HttpTest
 
 
 [System: Formula]
