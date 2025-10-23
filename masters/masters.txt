@@ -5,6 +5,7 @@
 	
 	Indent	: "Mappings"
 	Key Item: "Ledger"			: L : Alter		:	AP Ledger Map
+	Key Item: "Ledgers Create"	: C : Call		:	AP Ledger Create Fn
 	Key Item: "Group"			: G : Alter		:	AP Group Map
 	Key Item: "Stock Item"		: S : Alter		:	AP Stock Item Map
 	Key Item: "Unit"			: U : Alter		:	AP Unit Map	

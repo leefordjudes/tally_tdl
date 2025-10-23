@@ -101,8 +101,10 @@
 	1500: If: Not $$IsEmpty:$ref_no
 	1600: 	SET VALUE 	: Reference			: $ref_no	
 	1700: End If 
-	1800: If: ($mode = "INVENTORY" Or $mode = "GST") And +
-			  ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or +
+;	1800: If: ($mode = "INVENTORY" Or $mode = "GST") And +
+;			  ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or +
+;				$base_voucher_type = "CREDIT_NOTE" Or $base_voucher_type = "DEBIT_NOTE" )
+	1800: If: ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or +
 				$base_voucher_type = "CREDIT_NOTE" Or $base_voucher_type = "DEBIT_NOTE" )
 	1900: 	SET VALUE 	: GstRegistrationType		: "Unregistered/Consumer"
 	2000: 	If:  Not $$IsEmpty:$gst_reg_type
@@ -221,8 +223,8 @@
 
 	11900: SET VALUE   	: PersistedView 	: ##SVViewName
 	12000: If: ##CreateVch
-	12100: 		Increment: CreatedVch
-	12200: 		CREATE TARGET
+	12100: 		CREATE TARGET
+	12200: 		Increment: CreatedVch
 	12300: End if
 	12400: END BATCH POST
 

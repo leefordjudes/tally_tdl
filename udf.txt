@@ -1,7 +1,7 @@
 [System: UDF]
 	AP Host					: 	String		: 25001
 	AP Organization			:	String		: 25002
-	AP AuthToken			: 	String		: 25003
+	AP AuthToken			: 	String		: 25003	
 	
 	AP Name					:	String		: 25004
 	AP Tally Name			:	String		: 25005
@@ -24,6 +24,8 @@
 ;	AP Txn To Date			: 	String		: 25012
 
 	AP Id					: 	Number		: 25001
+	
+	Ap BookBegin			:   Date		: 25001
 		
 	AP Units				:	Aggregate	: 25001
 	AP Stock Items			:	Aggregate	: 25002

@@ -11,7 +11,7 @@
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Configuration"
 	
 [Part: AP Configuration Body]
-	Lines:	AP Host, AP Organization, AP AuthToken
+	Lines:	AP Host, AP Organization,AP BookBegin, AP AuthToken
 	
 	[Line: AP Host]
 		Fields: Medium Prompt, AP Host
@@ -35,6 +35,19 @@
 			Width	: 30
 			Max		: 250
 			Storage	: APOrganization
+			Style   : Normal Bold
+			Case    : Lower Case
+			
+	[Line: AP BookBegin]
+		Fields: Medium Prompt, AP BookBegin
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "BookBegin"
+		
+		[Field: AP BookBegin]
+			Width	: 30
+			Max		: 250
+			Storage	: APBookBegin
+			Type	: Date
 			Style   : Normal Bold
 			Case    : Lower Case
 	

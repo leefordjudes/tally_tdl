@@ -47,7 +47,7 @@
 	1300: 		Set: LpIdx: 1		
 	1400: 		Walk Collection: accounts
 	1500: 			If: $$ListFind:LedgerMapList:$$String:$id
-	1600: 				Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name
+	1600: 				Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name, ApTallyName : $name
 	1700: 			Else				
 	1800: 				INSERT COLLECTION OBJECT   : APLedgers
 	1900: 				SET VALUE  : APId   		: $id
@@ -78,7 +78,7 @@
 	2123:				If: Not $$IsEmpty:$country
 	2124: 					SET VALUE  : APCountry		: $country
 	2125:				End If
-	2200: 				RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	2200: 				SET VALUE  : APTallyName  	: $name
 	2300: 				Set Target: .. 				
 	2400: 			End If							
 	2500: 			Increment: LpIdx

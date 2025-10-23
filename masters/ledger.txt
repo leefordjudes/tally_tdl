@@ -10,20 +10,30 @@
 	Local: Form: APUnitMap: Delete: Buttons
 	Local: Form: APUnitMap: Add: Buttons: AP Delete All Ledger
 	Local: Form: APUnitMap: Add: Buttons: AP Create All Ledger
+	Local: Form: APUnitMap: Add: Buttons: AP Modify Ledger
 	
 	Local: Part: APUnitMap: Repeat: APUnitMap: AP Ledgers
 	
-	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Info: "Id"	
+	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Info: "Id"
+	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Width:10
 	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Info: "Name"
+	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Width:30
 	Local: Line: AP Unit Map Title: Local: Field : AP Uqc Field			: Info: "Account Type"
+	Local: Line: AP Unit Map Title: Local: Field : AP Uqc Field			: Width:30
 	Local: Line: AP Unit Map Title: Local: Field : AP Tally Name Field	: Info: "Tally Ledger"
+	Local: Line: AP Unit Map Title: Local: Field : AP Tally Name Field	: Width:30
 		
-	Local: Line: AP Unit Map : Local: Field: AP Id Field 		: Info: $APId
-	Local: Line: AP Unit Map : Local: Field: AP Name Field 		: Info: $APName
-	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 		: Info: $APAccountType
+	Local: Line: AP Unit Map : Local: Field: AP Id Field 		: Info	: $APId
+	Local: Line: AP Unit Map : Local: Field: AP Id Field 		: Width	:10
+	Local: Line: AP Unit Map : Local: Field: AP Name Field 		: Info	: $APName
+	Local: Line: AP Unit Map : Local: Field: AP Name Field 		: Width	:30
+	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 		: Info	: $APAccountType
+	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 		: Width	:30
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
 	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyLedgers, NotApplicable
-	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Add: Key: Create Ledger
+;	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Add: Key: Create Ledger
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Set As: $APTallyName
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Width:30
 
 
 [Collection: APLedgers]
@@ -39,13 +49,92 @@
 	050: End Walk
 	060: Alter Target
 	
-[Function: AP Test Fun]
-	010: Set Object: (Company, ##SVCurrentCompany).	 
-	020: Set Target
-;	030: Walk Collection: APLedgers
-	040:	Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $ApId=1].APTallyName: "Cash"
-;	050: End Walk
-	060: Alter Target
+[Function: AP Ledger Create Fn]
+	Variable: ApLedGroupName: String
+	Variable: ApApplicableFrom : String: $$String:($$YearOfDate:##ApBookBegin)+$$String:($$MonthOfDate:##ApBookBegin):2+$$String:($$DayofDate:##ApBookBegin):2
+	
+	LIST VARIABLE 	: ApGroupMapList 		: String
+	LIST VARIABLE 	: TallyLedgerMapList 	: String
+	
+	Local Formula: TallyGroupName: ##ApGroupMapList[$$ListIndex:ApGroupMapList:##ApLedGroupName]
+	
+	00010: Query Box: "Do you want to create ledgers" : Yes: No
+	00020: If: $$LastResult
+	00100:  Set Object: (Company, ##SVCurrentCompany).	 
+	00200:  LIST FILL : ApGroupMapList 	: APGroups 	: $ApName : $APTallyName
+	00201:  LIST FILL : TallyLedgerMapList : TallyLedgers : $name : $name
+	00300:  Walk Collection: APLedgers
+	00301:     If: $$ListFind:TallyLedgerMapList:$ApName Or $ApAccountType = "Profit & Loss"
+;	00301a:  	 Msg Box: "Tally ledger found:":"\nName:"+$ApName
+	00302:  		 Continue
+	00303:	   Else	
+;	00400:     If: $APAccountType = "Sundry Debtors" Or $APAccountType = "Sundry Creditor" +
+;			 	Or $APAccountType = "Indirect Expense" Or $APAccountType = "Direct Expense" + 
+;			 	Or $APAccountType = "Direct Income" Or $APAccountType = "Indirect Income" + 
+;			 	Or $APAccountType = "EFT Account" Or $APAccountType = "Branch / Division" +
+;			 	Or $APAccountType = "Fixed Asset" Or $APAccountType = "Current Asset" +
+;			 	Or $APAccountType = "Bank Account" Or $APAccountType = "Bank OD Account" +
+;			 	Or $APAccountType = "Current Liability" Or $APAccountType = "Longterm Liability" +
+;			 	Or $APAccountType = "Staffs Salary Payable" Or $APAccountType = "Staffs Advances" +
+;			 	Or $APAccountType = "Tds Payable" Or $APAccountType = "Tds Receivable" +
+;			 	Or $APAccountType = "Loans and Advances Asset" Or $APAccountType = "Equity"
+			 	
+	00500:  		Msg Box: $ApName: "Id:"+($$String:$ApId)+"\nName:"+$ApName+"\nAcType:"+$APAccountType+"\nPan:"+$ApPanNo
+	00600:  		Set: ApLedGroupName: $ApAccountType 
+	00700:	 	If: Not $$IsEmpty:@TallyGroupName
+		    
+	00800:  			New Object: Ledger
+	00900:	 		Set Value: Name				: $ApName
+	01000:	 		Set Value: Parent			: @TallyGroupName
+	01001:	 		If: Not $$IsEmpty:$ApPanNo
+	01002:  				Set Value: INCOMETAXNUMBER	: $ApPanNo
+	01003:	 		Else 
+	01004:	 			If: Not $$IsEmpty:$APGstNo
+	01005:  					SET VALUE  : INCOMETAXNUMBER	: $$Substr:$APGstNo:3:10
+	01006:	 			End If
+	01100:	 		End If					
+		    
+	01200:	 		Insert Collection Object: LedMailingDetails
+	01300:	 		Set Value:	APPLICABLEFROM 	: 	##ApApplicableFrom ;"20240401"
+	01400:	 		Set Value: 	MailingName		:	$ApName
+	01501:	 		If: Not $$IsEmpty:$ApAddress
+	01502:	 			Set Value: 	Address			:	$ApAddress
+	01503:	 		End If
+	01601:	 		If: Not $$IsEmpty:$ApState
+	01602:	 			Set Value: 	State			:	$ApState
+	01603:	 		Else
+	01604:	 			Set Value: 	State			:	"Tamil Nadu"
+	01605:	 		End If
+	01701:	 		If: Not $$IsEmpty:$APCountry
+	01702:	 			Set Value: 	Country			:	$APCountry
+	01703:	 		Else
+	01704:	 			Set Value: 	Country			:	"India"
+	01705:	 		End If
+	01800:	 		Set Target: ..
+		    
+	01900:	 		Insert Collection Object: LedGstRegDetails
+	02000:	 		Set Value:	APPLICABLEFROM 		: 	##ApApplicableFrom ;"20240401"
+	02101:	 		If: Not $$IsEmpty:$APGstRegType
+	02102:	 			Set Value: 	GSTREGISTRATIONTYPE	:	$APGstRegType
+	02103:	 		End If
+	02201:	 		If: Not $$IsEmpty:$APGstLocation
+	02202:	 			Set Value: 	PLACEOFSUPPLY		:	$APGstLocation
+	02203:	 		End If
+	02301:	 		If: Not $$IsEmpty:$APGstNo
+	02302:	 			Set Value: 	GSTIN				:	$APGstNo
+	02303:	 		End If
+	02400:	 		Set Target: ..
+	02401:  			Create Target
+;	02402:  			Msg Box: "ledger":"created"
+		    
+	02500:     	End If
+	02600:  		Set: ApLedGroupName: ""
+;	02700:     End If ;;account type check
+	02800:     End If
+		    
+    02900:  End Walk
+	03000: End If
+	
 		
 [Function: AP Create ALL Ledger]
 	Variable: i : Number: 1
@@ -54,36 +143,43 @@
 	LIST VARIABLE 	: Tally Ledger Map List 		: String
 	
 	100: Set Object: (Company, ##SVCurrentCompany).	 
-	101: LIST FILL : TallyLedgerMapList : TallyLedgers : $name : $parent
-	200: Set Target
+	101: LIST FILL : TallyLedgerMapList : TallyLedgers : $name : $name
 	300: Walk Collection: APLedgers	
 	400: 	If: $$IsEmpty:$APTallyName
 	500: 		Set: LedId: $ApId
 ;	500: 		Msg Box: "Not Mapped "+($$String:##i) :$ApName
-	600: 		If: $$ListFind:TallyLedgerMapList:$$String:$ApName
+	600: 		If: $$ListFind:TallyLedgerMapList:$ApName
 	700: 			Msg Box: $ApName: "Tally Account Found,"+($$String:##LedId)+" Map It"
 ;	701:			Set Value: APTallyName : $ApName;##TallyLedgerMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
-	702:			Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $ApId=##LedId].APTallyName : $APName
+;	702:			Modify Object : (Company, ##SVCurrentCompany).ApLedgers[First].APTallyName:"Cash"  ;, $ApId=##LedId
+	702:			Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1].APTallyName:"Cash"  ;, $ApId=##LedId
 ;	800:  		Else
 ;	900:			Msg Box: $ApName: "Tally Account Not Found, Create & Map It"
    1000:		End if
    1100:	End if
    1200:    Increment: i
    1300: 	If: ##i = 10
-   1301: 		Alter Target
    1400: 		Break
    1500: 	End if
    1600: End Walk
-   1601: Msg Box: "walk":"end"
-   1700: Alter Target
+
 	
 [Button: AP Delete All Ledger]
 	Key: F4
 	Action: Call : AP Delete ALL Ledger
 	Title: "Delete All"	
 
-[Button: AP Create All Ledger]
-	Key: F5
+;[Button: AP Create All Ledger]
+;	Key: F5
 ;	Action: Call : AP Create All Ledger
-	Action: Call:  AP Test Fun
-	Title: "Create Ledgers"		
+;;	Action: Call:  AP Ledger Map Fn
+;	Title: "Create Ledgers"	
+	
+;[Button: AP Modify Ledger]
+;	Key: F6
+;	Action: Modify Object : (ApLedgers,1).APTallyName:"Cash" 
+;;	Action: Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1,$ApId=1].APTallyName:"Cash" 
+;;	Action: Modify Object : (Ledger, "APOLLO ENTERPRISES").BillAllocations[1].OpeningBalance : 1000, +
+;;							BillDate: "01-04-2025", +
+;;							Name: "MyBill"
+;	Title: "Modify Ledger"	
