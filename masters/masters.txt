@@ -5,13 +5,16 @@
 	
 	Indent	: "Mappings"
 	Key Item: "Ledger"			: L : Alter		:	AP Ledger Map
+	Key Item: "Ledgers Create"	: C : Call		:	AP Ledger Create Fn
+	Key Item: "Group"			: G : Alter		:	AP Group Map
 	Key Item: "Stock Item"		: S : Alter		:	AP Stock Item Map
 	Key Item: "Unit"			: U : Alter		:	AP Unit Map	
-	Key Item: "VoucherType"		: V : Alter		:	AP VoucherType Map
+	Key Item: "VoucherType"		: V : Alter		:	AP VoucherType Map	
 	Item: Blank
 
 	Indent	: "Reports"
 	Key Item: "Ledger"			: E : Display	:	AP Ledger Map	
+	Key Item: "Group"			: R : Display	:	AP Group Map
 	Key Item: "Stock Item"		: I : Display	:	AP Stock Item Map
 	Key Item: "Unit"			: N : Display	:	AP Unit Map
 	Key Item: "Voucher Type"	: T : Display	:	AP VoucherType Map
@@ -20,5 +23,6 @@
 [Include: unit.txt]
 [Include: stock_item.txt]
 [Include: ledger.txt]
+[Include: group.txt]
 [Include: voucher_type.txt]
 [Include: download.txt]

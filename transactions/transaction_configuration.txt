@@ -17,10 +17,6 @@
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
 	On 			: Form Accept: Yes: Call: APTxnConfigurationOnSubmit
-;	On 			: Form Accept: Yes: LIST FILL : Ledger Map List : APLedgers : ($$String:$APId) : $APTallyName
-;	On 			: Form Accept: Yes: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
-;	On 			: Form Accept: Yes: LIST FILL : VoucherType Map List : APVoucherTypesMapped : $APId : $APTallyName
-;	On			: Form Accept: Yes: Call: APSaveVoucher
 
 [Part: AP Txn Configuration Body]
 	Line:	Ap Txn B2C Sale Daywise

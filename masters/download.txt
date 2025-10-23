@@ -7,6 +7,15 @@
 	RemoteRequest	: AP Tally Export Master Request: UTF8
 	JSON Object Path: "data:1"
 	
+;; Ref: https://tdlexpert.com/index.php?threads/some-useful-string-functions.4187/
+[Function:Substr]	
+	Parameter:sSource:String
+	Parameter:nStart:Number
+	Parameter:nLen:Number
+	Returns:String
+
+	100: Return: $$StringPart:##sSource:(##nStart-1):##nLen
+	
 [Function: AP Download Masters ]
 	Variable: ProgressCount		: Number		
 	
@@ -15,6 +24,7 @@
 	Variable: RowId				: Number
 	
 	LIST VARIABLE 	: Ledger Map List 		: String
+	LIST VARIABLE 	: Group Map List 		: String
 	LIST VARIABLE 	: StockItem Map List 	: String
 	LIST VARIABLE 	: VoucherType Map List 	: String
 
@@ -25,10 +35,11 @@
 	300: 	START BLOCK
 	400: 		Set Object: (Company, ##SVCurrentCompany).
 	500: 		LIST FILL : LedgerMapList 		: APLedgers 		: $APId 		: $APTallyName
+	510: 		LIST FILL : GroupMapList 		: APGroups 			: $APId 		: $APTallyName
 	600: 		LIST FILL : StockItemMapList 	: APStockItems 		: $APHsnCode 	: $APTallyName
 	700: 		LIST FILL : VoucherTypeMapList 	: APVoucherTypes 	: $APId 		: $APTallyName
 	800: 	END BLOCK	
-	900: 	START PROGRESS	: 4:"Downloading":"Masters"		
+	900: 	START PROGRESS	: 5:"Downloading":"Masters"		
 	1000: 	Walk Collection: AP Tally Export Master Data Source 			
 	1100: 		SET TARGET	: (Company, ##SVCurrentCompany).
 	1200: 		SET		: ProgressCount		: 1
@@ -36,13 +47,38 @@
 	1300: 		Set: LpIdx: 1		
 	1400: 		Walk Collection: accounts
 	1500: 			If: $$ListFind:LedgerMapList:$$String:$id
-	1600: 				Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name
+	1600: 				Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name, ApTallyName : $name
 	1700: 			Else				
 	1800: 				INSERT COLLECTION OBJECT   : APLedgers
 	1900: 				SET VALUE  : APId   		: $id
 	2000: 				SET VALUE  : APName 		: $name
 	2100: 				SET VALUE  : APAccountType	: $account_type_name
-	2200: 				RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	2101:				If: Not $$IsEmpty:$gst_reg_type
+	2102: 					SET VALUE  : APGstRegType	: $gst_reg_type
+	2103:				End If
+	2104:				If: Not $$IsEmpty:$gst_location
+	2105: 					SET VALUE  : APGstLocation	: $gst_location
+	2106:				End If
+	2107:				If: Not $$IsEmpty:$gst_no
+	2108: 					SET VALUE  : APGstNo		: $gst_no
+	2109:				End If
+	2110:				If: Not $$IsEmpty:$pan_no
+	2111: 					SET VALUE  : APPanNo		: $pan_no
+	2112:				Else 
+	2113:					If: Not $$IsEmpty:$gst_no
+	2114: 						SET VALUE  : APPanNo		: $$Substr:$gst_no:3:10
+	2115:					End If
+	2116:				End If
+	2117:				If: Not $$IsEmpty:$address
+	2118: 					SET VALUE  : APAddress		: $address
+	2119:				End If
+	2120:				If: Not $$IsEmpty:$state
+	2121: 					SET VALUE  : APState		: $state
+	2122:				End If
+	2123:				If: Not $$IsEmpty:$country
+	2124: 					SET VALUE  : APCountry		: $country
+	2125:				End If
+	2200: 				SET VALUE  : APTallyName  	: $name
 	2300: 				Set Target: .. 				
 	2400: 			End If							
 	2500: 			Increment: LpIdx
@@ -98,11 +134,30 @@
 	6900: 		End Walk				
 	
 	7000: 		SHOW PROGRESS	: ##ProgressCount
-	7100: 		INCREMENT		: ProgressCount			
-	7200: 		Alter Target
-	7300: 		END PROGRESS
-	7400: 	End Walk		
-	7500:End If
+	7100: 		INCREMENT		: ProgressCount		
+	
+	7200: 		Set: LpIdx: 1		
+	7300: 		Walk Collection: account_types
+	7400: 			If: $$ListFind:GroupMapList:$$String:$id
+	7500: 				Modify Object : (Company, ##SVCurrentCompany).ApGroups[1, $APId=$id].APName : $name
+	7600: 			Else				
+	7700: 				INSERT COLLECTION OBJECT   : APGroups
+	7800: 				SET VALUE  : APId   		: $id
+	7900: 				SET VALUE  : APName 		: $name
+	7910: 				SET VALUE  : APAccountType	: $base_types
+	8000: 				RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	8100: 				Set Target: .. 				
+	8200: 			End If							
+	8300: 			Increment: LpIdx
+	8400: 		End Walk
+	
+	8500: 		SHOW PROGRESS	: ##ProgressCount
+	8600: 		INCREMENT		: ProgressCount		
+	
+	8700: 		Alter Target
+	8800: 		END PROGRESS
+	8900: 	End Walk		
+	9000:End If
 
 
 

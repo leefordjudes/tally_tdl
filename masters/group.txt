@@ -1,0 +1,46 @@
+[Collection: TallyGroups]
+	Type: Group
+	Title: "Tally Group"
+	Format	: $Name, 40
+	
+[Report: AP Group Map]
+	Use: AP Unit Map
+	Title: "Auditplus Group Mapping"
+	
+	Local: Form: APUnitMap: Delete: Buttons
+	Local: Form: APUnitMap: Add: Buttons: AP Delete All Group
+	
+	Local: Part: APUnitMap: Repeat: APUnitMap: APGroups
+	
+	Local: Line: AP Unit Map Title: Local: Field : AP Id Field		    : Info: "Id"	
+	Local: Line: AP Unit Map Title: Local: Field : AP Name Field		: Info: "Group Name"
+	Local: Line: AP Unit Map Title: Local: Field : AP Uqc Field			: Info: "Base Account Type"
+;	Local: Line: AP Unit Map Title: Delete: Field: AP Uqc Field
+	Local: Line: AP Unit Map Title: Local: Field : AP Tally Name Field	: Info: "Tally Group"
+		
+	Local: Line: AP Unit Map : Local: Field: AP Id Field 		: Info: $APId
+	Local: Line: AP Unit Map : Local: Field: AP Name Field 		: Info: $APName
+	Local: Line: AP Unit Map : Local: Field: AP Uqc Field 		: Info: $APAccountType
+;	Local: Line: AP Unit Map : Delete: Field: AP Uqc Field
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Delete: Table
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Table: TallyGroups, NotApplicable
+	Local: Line: AP Unit Map : Local: Field: AP Tally Name Field : Add: Key: Create Group
+
+
+[Collection: APGroups]
+	Type		: APGroups	:	Company
+;	Filter		: NOT FilterMapped
+	Child of    : ##SVCurrentCompany
+
+[Function: AP Delete ALL Group]
+	010: Set Object: (Company, ##SVCurrentCompany).	 
+	020: Set Target
+	030: Walk Collection: APGroups
+		040: Delete Collection Object : APGroups
+	050: End Walk
+	060: Alter Target	
+	
+[Button: AP Delete All Group]
+	Key: F4
+	Action: Call : AP Delete ALL Group
+	Title: "Delete All"	
