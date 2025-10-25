@@ -60,7 +60,7 @@
 			Max			: 250
 			Type		: Date
 ;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
-			Set as		: $$SysInfo:SystemDate
+			Set As		: If $$IsEmpty:##TxnVchFromDate Then $$SysInfo:SystemDate Else ##TxnVchFromDate
 			Modifies	: TxnVchFromDate : Yes
 			Style   	: Normal Bold
 			Case    	: Lower Case
@@ -79,7 +79,7 @@
 			Max			: 250
 			Type		: Date
 ;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
-			Set as		: $$SysInfo:SystemDate
+			Set As		: If $$IsEmpty:##TxnVchToDate Then $$SysInfo:SystemDate Else ##TxnVchToDate
 			Modifies	: TxnVchToDate : Yes
 			Style   	: Normal Bold
 			Case    	: Lower Case

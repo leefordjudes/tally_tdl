@@ -16,7 +16,8 @@
 [System: Formula]
 	APHost			: $ApHost:Company:##SVCurrentCompany
 	APOrganization	: $ApOrganization:Company:##SVCurrentCompany	
-	APAuthToken		: $ApAuthToken:Company:##SVCurrentCompany	
+	APAuthToken		: $ApAuthToken:Company:##SVCurrentCompany
+	APBookBegin		: $ApBookBegin:Company:##SVCurrentCompany
 	
 
 [Include: udf.txt]

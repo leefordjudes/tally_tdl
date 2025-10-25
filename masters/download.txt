@@ -53,32 +53,36 @@
 	1900: 				SET VALUE  : APId   		: $id
 	2000: 				SET VALUE  : APName 		: $name
 	2100: 				SET VALUE  : APAccountType	: $account_type_name
-	2101:				If: Not $$IsEmpty:$gst_reg_type
-	2102: 					SET VALUE  : APGstRegType	: $gst_reg_type
-	2103:				End If
-	2104:				If: Not $$IsEmpty:$gst_location
-	2105: 					SET VALUE  : APGstLocation	: $gst_location
-	2106:				End If
-	2107:				If: Not $$IsEmpty:$gst_no
-	2108: 					SET VALUE  : APGstNo		: $gst_no
-	2109:				End If
-	2110:				If: Not $$IsEmpty:$pan_no
-	2111: 					SET VALUE  : APPanNo		: $pan_no
-	2112:				Else 
-	2113:					If: Not $$IsEmpty:$gst_no
-	2114: 						SET VALUE  : APPanNo		: $$Substr:$gst_no:3:10
-	2115:					End If
-	2116:				End If
-	2117:				If: Not $$IsEmpty:$address
-	2118: 					SET VALUE  : APAddress		: $address
-	2119:				End If
-	2120:				If: Not $$IsEmpty:$state
-	2121: 					SET VALUE  : APState		: $state
-	2122:				End If
-	2123:				If: Not $$IsEmpty:$country
-	2124: 					SET VALUE  : APCountry		: $country
-	2125:				End If
 	2200: 				SET VALUE  : APTallyName  	: $name
+
+	2201:				If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "UNREGISTERED"
+	2202: 					SET VALUE  : APGstRegType	: "Unregistered/Consumer"
+	2203:				End If
+	2204:				If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "REGULAR"
+	2205: 					SET VALUE  : APGstRegType	: "Regular"
+	2206:				End If
+	2207:				If: Not $$IsEmpty:$gst_no
+	2208: 					SET VALUE  : APGstNo		: $gst_no
+	2209:				End If
+	2210:				If: $$IsEmpty:$pan_no And Not $$IsEmpty:$gst_no
+	2211: 					SET VALUE  : APPanNo	: $$Substr:$gst_no:3:10
+	2212:				End If
+	2213:				If: Not $$IsEmpty:$address
+	2214: 					SET VALUE  : APAddress		: $address
+	2215:				End If
+	2216:				If: Not $$IsEmpty:$gst_location Or Not $$IsEmpty:$country
+	2217: 					SET VALUE  : APCountry		: "India"
+	2218:				End If
+	  
+	2219:				If: Not $$IsEmpty:$gst_location And $gst_location = "TamilNadu" 
+	2220: 					SET VALUE  : APGstLocation	: "Tamil Nadu"
+	2221: 					SET VALUE  : APState		: "Tamil Nadu"
+	2222:				End If
+	2223:				If: Not $$IsEmpty:$gst_location And $gst_location != "TamilNadu"
+	2224: 					SET VALUE  : APGstLocation	: $gst_location
+	2225: 					SET VALUE  : APState		: $gst_location	
+	2226:				End If
+	
 	2300: 				Set Target: .. 				
 	2400: 			End If							
 	2500: 			Increment: LpIdx
