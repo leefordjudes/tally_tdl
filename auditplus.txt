@@ -5,12 +5,11 @@
 
 [Menu: Auditplus Integration]
 	
+	Key Item: "Login"				: L : Alter	:	AP Login
 	Key Item: "Masters"				: M : Menu	:	AP Masters
-;	Key Item: "Transactions"		: T : Call	:	AP SaveVoucher
-;	Key Item: "Transactions"		: T : Display:	AP SaveVoucher
 	Key Item: "Transactions"		: T : Alter	:   AP Txn Configuration
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
-;	Key Item: "Http Test" 			: H	: Call	: 	HttpTest
+
 
 
 [System: Formula]
@@ -22,11 +21,11 @@
 
 [Include: udf.txt]
 [Include: company_details.txt]
+[Include: auditplus_login.txt]
 [Include: configuration/configuration.txt]
 [Include: masters/masters.txt]
 [Include: transactions/transactions.txt]
 [Include: transactions/transaction_configuration.txt]
-[Include: transactions/httptest.txt]
 
 
 [Collection: Rpc Data Source]

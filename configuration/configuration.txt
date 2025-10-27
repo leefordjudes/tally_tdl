@@ -6,13 +6,14 @@
 [Form: AP Configuration]	
 	Parts: Form SubTitle, AP Configuration Body	
 	FullWidth   : No
-	Space Left	: 2
-	Space Right	: 2
+	Space Left	: 3
+	Space Right	: 3
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Configuration"
+	Local       : Field : Form SubTitle : Style: Large Bold
 	
 	
 [Part: AP Configuration Body]
-	Lines:	AP Host, AP Organization, AP BookBegin, AP AuthToken
+	Lines:	AP Host, AP Organization, AP BookBegin
 	
 	[Line: AP Host]
 		Fields: Medium Prompt, AP Host
@@ -20,7 +21,7 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "Host"
 		
 		[Field: AP Host]
-			Width	: 30
+			Width	: 40
 			Max		: 250
 			Storage	: APHost
 			Style   : Normal Bold
@@ -33,7 +34,7 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "Organization"
 		
 		[Field: AP Organization]
-			Width	: 30
+			Width	: 40
 			Max		: 250
 			Storage	: APOrganization
 			Style   : Normal Bold
@@ -45,22 +46,11 @@
 		Local	:	Field	:	Medium Prompt	: Info		: "BookBegin"
 		
 		[Field: AP BookBegin]
-			Width	: 30
+			Width	: 40
 			Max		: 250
 			Storage	: APBookBegin
 			Type	: Date
 			Style   : Normal Bold
 	
-	[Line: AP AuthToken]
-		Fields: Medium Prompt, AP AuthToken
-		Space Bottom	: 1
-		Local	:	Field	:	Medium Prompt	: Info		: "AuthToken"
-		
-		[Field: AP AuthToken]
-			Width	: 30
-			Max		: 250
-			Storage	: APAuthToken
-			Style   : Small
-			Tool Tip : "Please Enter Auth Token, Get it from Tenant API"
 		
 
