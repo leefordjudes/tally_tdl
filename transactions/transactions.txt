@@ -90,7 +90,6 @@
 	400:  	SET		: SVViewName 			: $$SysName:InvVchView
 	500:  End If
 	600:  NEW OBJECT : Voucher	
-	610:  Set Value		: Auditplus				: Yes
 	700:  SET VALUE 	: Date 					: $date	
 	800:  SET VALUE 	: VoucherTypeName 		: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
 	900:  SET VALUE 	: VoucherNumber			: $voucher_no
