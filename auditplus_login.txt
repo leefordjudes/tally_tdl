@@ -1,0 +1,115 @@
+[System: Formula]
+ UnameEmtyErr: "Username can not be empty"
+ PwdEmtyErr: "Password can not be empty"
+
+[Function: AP Login Submit]
+	Parameter: ApUsername: String
+	Parameter: ApPassword: String
+	
+	00100: Walk Collection: TallyToApLogin Data Source
+	00200: 	Set Target: (Company, ##SvCurrentCompany).
+	00300: 	If: Not $$IsEmpty:$token
+	00400:  	Set Value: ApAuthToken : $token	
+	00500: 		Msg Box: "Response": "Login success"
+	00600: 	Else
+	00700:  	Reset Value: ApAuthToken
+	00800: 		Msg Box: "Response": "Login failed\n due to invalid credentials"
+	00900: 	End If
+	01000:  Alter Target
+	01100: End Walk	
+
+[Report: AP Login]
+	Title	: Login Auditplus
+	Form	: AP Login
+	Object	: Company:##SVCurrentCompany
+	
+[Form: AP Login]	
+	Parts: Form SubTitle, AP Login Body	
+	FullWidth   : No
+	Space Left	: 3
+	Space Right	: 3
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Login Auditplus"
+	Local       : Field : Form SubTitle : Style: Large Bold
+	On			: Form Accept: Yes: Call: APLoginSubmit:#APUsername:#APPassword	
+	
+[Part: AP Login Body]
+	Lines:	AP Username, AP Password
+	
+	[Line: AP Username]
+		Fields: Medium Prompt, AP Username
+		Space Bottom	: 0.5
+		Local	:	Field	:	Medium Prompt	: Info		: "Username"
+		
+		[Field: AP Username]
+			Width	: 30
+			Max		: 100
+			Type	: String
+			Style   : Normal Bold			
+			Validate: NOT $$IsEmpty:$$Value
+			Control	: UnameEmtyErr: ($$IsEmpty:$$Value)
+			Tooltip : "Enter Username, Username can not be empty" 
+
+	[Line: AP Password]
+		Fields: Medium Prompt, AP Password
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "Password"
+		
+		[Field: AP Password]
+			Width	: 30
+			Max		: 100
+			Type	: String
+			Style   : Normal Bold
+			Validate: NOT $$IsEmpty:$$Value
+			Control	: PwdEmtyErr: ($$IsEmpty:$$Value)
+			Tooltip : "Enter Password, Password can not be empty" 
+
+
+		
+;; Ap Login Request and Response
+[Collection: TallyToApLogin Data Source]
+	Data Source		: HTTP JSON: @@APHost: UTF8
+	JSON Object Path: "data:1"
+	RemoteRequest	: TallyToApLogin Rpc Request: UTF8
+	Export Header	: "organization:" + @@APOrganization
+;;----------------------------Ap Login RPC Request Start---------------------	
+[Report: TallyToApLogin Rpc Request]
+	Form: TallyToApLogin Rpc Request
+	Plain JSON: Yes
+		
+[Form: TallyToApLogin Rpc Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: TallyToApLogin Rpc Request Method, TallyToApLogin Rpc Request Data
+	
+[Part: TallyToApLogin Rpc Request Method]
+	Line: TallyToApLogin Rpc Request Method
+	Scroll: Vertical
+	
+	[Line: TallyToApLogin Rpc Request Method]
+		Field: TallyToApLogin Rpc Request Method
+			
+			[Field: TallyToApLogin Rpc Request Method]
+				Use: Name Field
+				JSONTag: "method"
+				Set as: "login"
+				
+[Part: TallyToApLogin Rpc Request Data]
+	Line: TallyToApLogin Rpc Request Data
+	JSONTag: "data"
+	Scroll: Vertical
+
+	[Line: TallyToApLogin Rpc Request Data]		
+		Field: TallyToApLogin Request Username
+		Field: TallyToApLogin Request Password		
+			
+			[Field: TallyToApLogin Request Username]
+				Type: String
+				JSONTag: "username"	
+				Set As: ##ApUsername
+				
+			[Field: TallyToApLogin Request Password]
+				Type: String
+				JSONTag: "password"
+				Set as: ##ApPassword			
+;;----------------------------Ap Login RPC Request End---------------------	
