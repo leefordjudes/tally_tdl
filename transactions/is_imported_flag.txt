@@ -19,6 +19,39 @@
 	Storage:ApIsImported
 	Info: If $$IsEmpty:$ApIsImported Then No Else $ApIsImported
 	Invisible: Yes
+;;==============================================================================
+
+[System: Formula]
+	FltApImportedVouchers: $ApIsImported = Yes
+	FltTallyCreatedVouchers: Not $ApIsImported = Yes
+	FltApImportedVouchersByDate: $ApIsImported = Yes And ($Date >= ##ApDeleteVoucherFromDate) And ($Date <= ##ApDeleteVoucherToDate)
+
+[#Menu: Auditplus Integration]
+	Add	: Key Item: "Delete AP Vouchers" : D : Call	:	ApDeleteVouchersFn
+	
+[Collection: ApDeleteVouchersColl]
+	Type		: Vouchers
+	Filter		: FltApImportedVouchersByDate
+	Format		: $VoucherTypeName, 40		
+	Format		: $VoucherNumber, 40	
+	Format		: $ApIsImported, 10
+	Format		: $Date, 10
+	
+[Function: ApDeleteVouchersFn]
+	Variable: ApDeleteVoucherFromDate: Date:"20240401"
+	Variable: ApDeleteVoucherToDate: Date:"20240401"
+	
+	Local Formula: VC: $$NumItems:ApDeleteVouchersColl
+	
+	0100: Query Box: "Sure to Delete Import Vouchers" : Yes: No
+	0200: If: $$LastResult
+	0300: 	Msg Box: "Voucher Count": @VC
+	0400: 	Walk Collection: ApDeleteVouchersColl
+	0500: 		Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
+	0510: 		Set Target
+	0520: 		Delete Target
+	0600: 	End Walk
+	0700: End if
 
 
 ;; Check ApIsImported flag in voucher
