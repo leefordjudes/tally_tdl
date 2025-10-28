@@ -1,6 +1,6 @@
 [Collection: TallyExportVoucher Data Source]
 	Data Source		: HTTP JSON: @@APHost: UTF8
-	JSON Object Path: "data:1"
+;	JSON Object Path: "data:1"
 	RemoteRequest	: TallyExportVoucher Rpc Request: UTF8
 	Export Header	: "organization:" + @@APOrganization
 	Export Header	: "auth_token:" + @@APAuthToken	

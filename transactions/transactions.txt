@@ -32,12 +32,21 @@
 [Function: APSaveVoucher]
 	Variable: SkippedVch 		: Number : 0
 	Variable: CreatedVch 		: Number : 0
+	Variable: DataCount			: Number : 0
+	Variable: ProgressCount		: Number : 0 
+	Local Formula: LedCount: $$ListCount:LedgerMapList
 
 	Local Formula: VtypName: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
 	
 	100: Walk Collection: TallyExportVoucher Data Source
-;	mb2: 	Msg Box: $id:$voucher_no	
-	200: 	call : APSaveEachVoucher
+	101:    Set: DataCount: $$NumItems:data
+	102: 	START PROGRESS	: ##DataCount:"Import Auditplus Voucher":"Creating vouchers"
+	103:  	SET: ProgressCount: 1
+	110:    Walk Collection: data
+	120:		SHOW PROGRESS: ##ProgressCount
+	200: 		call : APSaveEachVoucher				
+	210: 	   INCREMENT: ProgressCount
+	250:    End Walk
 	300: End Walk
 	400: Call: AP Update Map
 	500: Msg Box: "Result": ($$String:##CreatedVch) +" "+@VtypName+" Vouchers\n Successfully Created"
