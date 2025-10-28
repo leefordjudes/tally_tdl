@@ -98,7 +98,7 @@
 	400:  	SET		: SVViewName 			: $$SysName:InvVchView
 	500:  End If
 	600:  NEW OBJECT : Voucher	
-	601:  Set Value		: ImportedFrom			: "Auditplus"
+	601:  Set Value		: ApIsImported			: Yes
 	700:  SET VALUE 	: Date 					: $date	
 	800:  SET VALUE 	: VoucherTypeName 		: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
 	900:  SET VALUE 	: VoucherNumber			: $voucher_no
@@ -136,7 +136,9 @@
 	3600: End If
 
 	3700: If: Not $$IsEmpty:$description
-	3800: 	SET VALUE 	: NARRATION			: $description		
+	3800: 	SET VALUE 	: NARRATION			: $description+", Imported From Auditplus"
+	3810: Else
+	3820: 	SET VALUE 	: NARRATION			: "Imported From Auditplus"
 	3900: End If
 	4000: SET VALUE 	: EFFECTIVEDATE		: $eff_date
 	
