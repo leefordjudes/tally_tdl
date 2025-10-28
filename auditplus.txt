@@ -9,7 +9,42 @@
 	Key Item: "Masters"				: M : Menu	:	AP Masters
 	Key Item: "Transactions"		: T : Alter	:   AP Txn Configuration
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
+	Key Item: "Check Voucher"		: V : Call	:	CheckApVoucherFn
 
+[Collection: TallyVouchers]
+	Type		: Vouchers
+	Format		: $VoucherNumber, 40	
+	Format		: $ImportedFrom, 40	
+	
+[Function: CheckApVoucherFn]
+	Local Formula: VC: $$NumItems:TallyVouchers
+	
+	100: Query Box: "Do you want to Check Vouchers" : Yes: No
+	200: If: $$LastResult
+	300: 	Msg Box: "Voucher Count": @VC
+	400: 	Walk Collection: TallyVouchers
+	500: 		Msg Box: "VoucherNumber":$VoucherNumber
+	600: 		Msg Box: "ImportedFrom":$ImportedFrom
+	700: 	End Walk
+	800: End if
+	
+;[#Object: Voucher]
+;	Storage  : ImportedFrom : String
+
+[#Part: VCH Narration]
+	Add:Line:ImportedFrom
+[Line:ImportedFrom]
+	Field:ImportedFromTitle,ImportedFrom	
+[Field:ImportedFromTitle]
+	Use: Name Field
+	Info: "Imported From : "
+	Style: Normal
+	Skip: Yes
+[Field:ImportedFrom]
+	Use: Name Field
+	Type:String
+	Storage:ImportedFrom
+	Set as:$ImportedFrom
 
 
 [System: Formula]

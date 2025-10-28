@@ -27,8 +27,7 @@
 	Title		: "Mapped Voucher Types"	
 	Format		: $APId, 5	
 	Format		: $APTallyName, 20
-	
-	
+		
 [Function: APSaveVoucher]
 	Variable: SkippedVch 		: Number : 0
 	Variable: CreatedVch 		: Number : 0
@@ -99,6 +98,7 @@
 	400:  	SET		: SVViewName 			: $$SysName:InvVchView
 	500:  End If
 	600:  NEW OBJECT : Voucher	
+	601:  Set Value		: ImportedFrom			: "Auditplus"
 	700:  SET VALUE 	: Date 					: $date	
 	800:  SET VALUE 	: VoucherTypeName 		: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
 	900:  SET VALUE 	: VoucherNumber			: $voucher_no
