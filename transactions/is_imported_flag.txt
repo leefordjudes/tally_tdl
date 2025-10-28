@@ -23,28 +23,28 @@
 
 ;; Check ApIsImported flag in voucher
 
-[#Menu: Auditplus Integration]
-	Add	: Key Item: "Check Voucher"		: V : Call	:	CheckApVoucherFn
-
-[System: Formula]
-	FltApImportedVouchers: $ApIsImported = Yes
-	FltTallyCreatedVouchers: Not $ApIsImported = Yes
-	
-[Collection: ApImportedVouchers]
-	Type		: Vouchers
-	Filter		: FltApImportedVouchers
-	Format		: $VoucherTypeName, 40		
-	Format		: $VoucherNumber, 40	
-	Format		: $ApIsImported, 10	
-	
-[Function: CheckApVoucherFn]
-	Local Formula: VC: $$NumItems:ApImportedVouchers
-	
-	100: Query Box: "Do you want to Check Vouchers" : Yes: No
-	200: If: $$LastResult
-	300: 	Msg Box: "Voucher Count": @VC
-	400: 	Walk Collection: ApImportedVouchers
-	500: 		Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
-	600: 	End Walk
-	700: End if
+;[#Menu: Auditplus Integration]
+;	Add	: Key Item: "Check Voucher"		: V : Call	:	CheckApVoucherFn
+;
+;[System: Formula]
+;	FltApImportedVouchers: $ApIsImported = Yes
+;	FltTallyCreatedVouchers: Not $ApIsImported = Yes
+;	
+;[Collection: ApImportedVouchers]
+;	Type		: Vouchers
+;	Filter		: FltApImportedVouchers
+;	Format		: $VoucherTypeName, 40		
+;	Format		: $VoucherNumber, 40	
+;	Format		: $ApIsImported, 10	
+;	
+;[Function: CheckApVoucherFn]
+;	Local Formula: VC: $$NumItems:ApImportedVouchers
+;	
+;	100: Query Box: "Do you want to Check Vouchers" : Yes: No
+;	200: If: $$LastResult
+;	300: 	Msg Box: "Voucher Count": @VC
+;	400: 	Walk Collection: ApImportedVouchers
+;	500: 		Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
+;	600: 	End Walk
+;	700: End if
 	
