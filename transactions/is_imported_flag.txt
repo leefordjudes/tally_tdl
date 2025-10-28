@@ -1,0 +1,50 @@
+;; Add ApIsImported flag to voucher
+
+[#Part: VCH Narration]
+	Add:Line:ApIsImported
+
+[Line:ApIsImported]
+	Field:ApIsImportedTitle, ApIsImported
+	
+[Field:ApIsImportedTitle]
+	Use: Name Field
+	Info: "Is Imported From Auditplus : "
+	Style: Normal Bold
+	Skip: Yes
+	Invisible: Yes
+	
+[Field:ApIsImported]
+	Use: Logical Field
+	Type:Logical
+	Storage:ApIsImported
+	Info: If $$IsEmpty:$ApIsImported Then No Else $ApIsImported
+	Invisible: Yes
+
+
+;; Check ApIsImported flag in voucher
+
+[#Menu: Auditplus Integration]
+	Add	: Key Item: "Check Voucher"		: V : Call	:	CheckApVoucherFn
+
+[System: Formula]
+	FltApImportedVouchers: $ApIsImported = Yes
+	FltTallyCreatedVouchers: Not $ApIsImported = Yes
+	
+[Collection: ApImportedVouchers]
+	Type		: Vouchers
+	Filter		: FltApImportedVouchers
+	Format		: $VoucherTypeName, 40		
+	Format		: $VoucherNumber, 40	
+	Format		: $ApIsImported, 10	
+	
+[Function: CheckApVoucherFn]
+	Local Formula: VC: $$NumItems:ApImportedVouchers
+	
+	100: Query Box: "Do you want to Check Vouchers" : Yes: No
+	200: If: $$LastResult
+	300: 	Msg Box: "Voucher Count": @VC
+	400: 	Walk Collection: ApImportedVouchers
+	500: 		Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
+	600: 	End Walk
+	700: End if
+	

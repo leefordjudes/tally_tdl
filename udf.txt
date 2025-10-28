@@ -26,6 +26,8 @@
 	AP Id					: 	Number		: 25001
 	
 	Ap BookBegin			:   Date		: 25001
+	
+	Ap Is Imported			:   Logical		: 25000
 		
 	AP Units				:	Aggregate	: 25001
 	AP Stock Items			:	Aggregate	: 25002

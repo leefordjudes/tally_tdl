@@ -11,7 +11,6 @@
 	Key Item: "Configuration"		: C : Alter	:	AP Configuration 
 
 
-
 [System: Formula]
 	APHost			: $ApHost:Company:##SVCurrentCompany
 	APOrganization	: $ApOrganization:Company:##SVCurrentCompany	
@@ -26,6 +25,7 @@
 [Include: masters/masters.txt]
 [Include: transactions/transactions.txt]
 [Include: transactions/transaction_configuration.txt]
+[Include: transactions/is_imported_flag.txt]
 
 
 [Collection: Rpc Data Source]
