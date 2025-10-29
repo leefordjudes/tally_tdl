@@ -12,5 +12,6 @@
 * inventory type vouchers & based on hsn/unit/tax - are not supported
 * Progressbar added in Voucher download
 * IsImported flag in voucher to identify auditplus voucher
+* Delete imported vouchers based on date, voucher type
 
 
