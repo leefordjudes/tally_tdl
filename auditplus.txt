@@ -12,7 +12,7 @@
 
 
 [System: Formula]
-	APHost			: $ApHost:Company:##SVCurrentCompany
+	APHost			: $$String:(($ApHost:Company:##SVCurrentCompany)+"/rest/rpc")
 	APOrganization	: $ApOrganization:Company:##SVCurrentCompany	
 	APAuthToken		: $ApAuthToken:Company:##SVCurrentCompany
 	APBookBegin		: $ApBookBegin:Company:##SVCurrentCompany
