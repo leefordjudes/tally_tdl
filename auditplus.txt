@@ -26,6 +26,7 @@
 [Include: transactions/transactions.txt]
 [Include: transactions/transaction_configuration.txt]
 [Include: transactions/is_imported_flag.txt]
+[Include: transactions/delete_ap_voucher.txt]
 
 
 [Collection: Rpc Data Source]
