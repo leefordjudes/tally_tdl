@@ -1,0 +1,103 @@
+
+[#Menu: Auditplus Integration]
+	Add	: Key Item: "Delete Imported Vouchers" : D : Alter	:	AP Del Imp Vch Configuration
+
+[Collection: APVoucherTypeNamesMapped]
+	Use			: APVoucherTypes
+	Filter		: VchTypeMappedFlt
+	Title		: "Mapped Voucher Type Names"	
+	Format		: $APTallyName, 20
+
+[Report: AP Del Imp Vch Configuration]
+	Title	: 	Delete Imported Voucher
+	Form	: 	AP Del Imp Vch Configuration
+	Object	:	Company	: ##SVCurrentCompany
+	
+[Form: AP Del Imp Vch Configuration]	
+	Parts		: Form SubTitle, AP DelImpVch Configuration Body	
+	FullWidth   : No
+	Space Left	: 2
+	Space Right	: 2
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Delete Imported Voucher Configuration"
+	On 			: Form Accept: Yes: Call: ApDeleteVouchersFn:#ApDelImpVchFromDate:#ApDelImpVchToDate:#ApDelImpVchTypeName
+
+[Part: AP DelImpVch Configuration Body]
+	Line:	AP DelImpVch From Date
+	Line:	AP DelImpVch To Date
+	Line:	Ap DelImp VchTypeName
+				
+	[Line: AP DelImpVch From Date]
+		Fields: Medium Prompt, AP DelImpVch From Date
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
+		
+		[Field: AP DelImpVch From Date]
+			Width		: 20
+			Max			: 250
+			Type		: Date
+			Set As		: If $$IsEmpty:#ApDelImpVchFromDate Then $$SysInfo:SystemDate Else #ApDelImpVchFromDate
+			Modifies	: TxnVchFromDate : Yes
+			Style   	: Normal Bold
+			Case    	: Lower Case			
+
+	[Line: Ap DelImpVch To Date]
+		Fields: Medium Prompt, Ap DelImpVch To Date
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
+		
+		[Field: AP DelImpVch To Date]	
+			Width		: 20
+			Max			: 250
+			Type		: Date
+			Set As		: If $$IsEmpty:##ApDelImpVchToDate Then $$SysInfo:SystemDate Else ##ApDelImpVchToDate
+			Style   	: Normal Bold
+			Case    	: Lower Case
+		
+	[Line: Ap DelImp VchType Name]
+		Fields: Medium Prompt, AP DelImp VchTypeName
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
+		
+		[Field: AP DelImp VchTypeName]
+			Width		: 20
+			Max			: 250
+			Style   	: Normal Bold
+			Show Table	: Always
+			Table		: APVoucherTypeNamesMapped
+			Tooltip		: "Mapped voucher Type Names"
+
+[System: Formula]
+	FltApImportedVouchersByDate: $ApIsImported = Yes And +
+		($Date >= ##ApDeleteVoucherFromDate) And +
+		($Date <= ##ApDeleteVoucherToDate) And +
+		($VoucherTypeName = ##ApDeleteVoucherTypeName)
+	
+[Collection: ApDeleteVouchersColl]
+	Type		: Vouchers
+	Filter		: FltApImportedVouchersByDate
+	Format		: $VoucherTypeName, 40		
+	Format		: $VoucherNumber, 40	
+	Format		: $ApIsImported, 10
+	Format		: $Date, 10
+	
+[Function: ApDeleteVouchersFn]
+	Parameter: ApDeleteVoucherFromDate	: Date 
+	Parameter: ApDeleteVoucherToDate	: Date 
+	Parameter: ApDeleteVoucherTypeName	: String
+	
+	0100: If:Not $$IsEmpty:($$NumItems:ApDeleteVouchersColl)
+	0200: Query Box: "Sure to Delete Import Vouchers" : Yes: No
+	0300: If: $$LastResult
+	0400:   Start Progress:($$NumItems:ApDeleteVouchersColl):"Deleting Imported vouchers"
+	0500: 	Start Batch Post:100
+	0600: 	Walk Collection: ApDeleteVouchersColl
+	0700:       Show Progress:$$LoopIndex:$$Sprintf:"Deleting voucher Date: %s, VchNo: %s, Imported: %s":($$DDMMYYYYDateFormat:$Date:"-"):$VoucherNumber:$ApIsImported
+;	0710: 		Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
+	0800: 		Set Target
+	0900: 		Delete Target
+	1000: 	End Walk
+	1100:   End Batch Post
+	1200:   End Progress
+	1300: End if
+	1400: End if
+	

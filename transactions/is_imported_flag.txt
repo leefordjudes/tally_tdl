@@ -19,6 +19,8 @@
 	Storage:ApIsImported
 	Info: If $$IsEmpty:$ApIsImported Then No Else $ApIsImported
 	Invisible: Yes
+;;==============================================================================
+
 
 
 ;; Check ApIsImported flag in voucher
