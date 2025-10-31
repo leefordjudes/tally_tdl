@@ -83,7 +83,7 @@
 	Local Formula: rate: $rate
 	Local Formula: qty: $qty * -1	
 	
-	Local Formula: lc: $$ListIndex:LedgerMapList:##IdVar
+	;Local Formula: lc: $$ListIndex:LedgerMapList:##IdVar
 
 	010: START BATCH POST : 100
 	100:  If: ##TxnAccountOnly = Yes Or $mode = "ACCOUNT" Or $mode = "GST"
@@ -104,9 +104,7 @@
 	1500: If: Not $$IsEmpty:$ref_no
 	1600: 	SET VALUE 	: Reference			: $ref_no	
 	1700: End If 
-;	1800: If: ($mode = "INVENTORY" Or $mode = "GST") And +
-;			  ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or +
-;				$base_voucher_type = "CREDIT_NOTE" Or $base_voucher_type = "DEBIT_NOTE" )
+
 	1800: If: ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or +
 				$base_voucher_type = "CREDIT_NOTE" Or $base_voucher_type = "DEBIT_NOTE" )
 	1900: 	SET VALUE 	: GstRegistrationType		: "Unregistered/Consumer"

@@ -34,7 +34,8 @@
 			Type		: Logical
 			Use         : Logical Field
 			Modifies    : Txn B2C Sale Daywise : Yes
-			Set As		: If $$IsEmpty:##TxnB2CSaleDaywise Then No else ##TxnB2CSaleDaywise
+			Info  			: Yes;If $$IsEmpty:##TxnB2CSaleDaywise Then No else ##TxnB2CSaleDaywise
+			
 
 	[Line:	Ap Txn Account Only]
 		Fields:	Medium Prompt, Ap Txn Account Only
@@ -45,7 +46,7 @@
 			Type		: Logical
 			Use         : Logical Field
 			Modifies    : Txn Account Only : Yes
-			Set As		: If $$IsEmpty:##TxnAccountOnly Then No else ##TxnAccountOnly
+			Info				: Yes ;If $$IsEmpty:##TxnAccountOnly Then No else ##TxnAccountOnly
 			
 	[Line: AP Txn From Date]
 		Fields: Medium Prompt, AP Txn From Date
