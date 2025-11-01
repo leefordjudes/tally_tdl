@@ -1,6 +1,6 @@
 [Menu: AP Masters]
 	Title	: "Masters (Auditplus To Tally)"
-	Key Item: "Download"		: D : Call		:	AP Download Masters
+	Key Item: "Download"		: D : Call		:	APDownloadMasters
 	Item: Blank	
 	
 	Indent	: "Mappings"

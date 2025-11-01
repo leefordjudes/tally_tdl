@@ -30,7 +30,7 @@ In APlus account_id=20 having account_type_name='Profit & Loss', in that place u
 	
 	
 	00100:  If: $$IsEmpty:@@ApBookBegin
-	00200:  	Msg Box: "Missing Details": "BookBegin not filled in Configuration Page"
+	00200:  	Msg Box: "Missing BookBegin": "BookBegin not filled in Configuration Page"
 	00300:  	Break
 	00400:  End If
 	00500:	Set: ApMasterDownloadTables: "account"
