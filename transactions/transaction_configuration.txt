@@ -1,8 +1,10 @@
 [Function: AP Txn Configuration On Submit]
-	100: LIST FILL : Ledger Map List : APLedgers : ($$String:$APId) : $APTallyName
-	200: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
-	300: LIST FILL : VoucherType Map List : APVoucherTypesMapped : $APId : $APTallyName	
-	400: Call: APSaveVoucher
+;	100: LIST FILL : Ledger Map List : APLedgers : ($$String:$APId) : $APTallyName
+	100: LIST FILL : Tally Ledger Map List	: TallyLedgers 					: $name				: $parent
+	200: LIST FILL : Ap Group Map List 			: ApGroups 							: $ApName 		: $APTallyName
+	300: LIST FILL : Stock Item Map List 		: APStockItems 					: $APHsnCode 	: $APTallyName
+	400: LIST FILL : Voucher Type Map List 	: APVoucherTypesMapped 	: $APId 			: $APTallyName	
+	500: Call: APSaveVoucher
 
 [Report: AP Txn Configuration]
 	Title	: 	Transaction Configuration
@@ -62,9 +64,10 @@
 			Type		: Date
 ;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Set As		: If $$IsEmpty:##TxnVchFromDate Then $$SysInfo:SystemDate Else ##TxnVchFromDate
+			Storage		: TxnVchFromDate 
 			Modifies	: TxnVchFromDate : Yes
 			Style   	: Normal Bold
-			Case    	: Lower Case
+			Tooltip		: "Date datatype, Download Transaction from 'From Date'"
 			
 
 	[Line: Ap Txn To Date]
@@ -81,9 +84,11 @@
 			Type		: Date
 ;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Set As		: If $$IsEmpty:##TxnVchToDate Then $$SysInfo:SystemDate Else ##TxnVchToDate
+			Storage		: TxnVchToDate 
 			Modifies	: TxnVchToDate : Yes
 			Style   	: Normal Bold
-			Case    	: Lower Case
+			Tooltip		: "Date datatype, Download Transaction upto 'To Date'"
+			
 		
 	[Line: Ap Txn Voucher Type]
 		Fields: Medium Prompt, AP Txn Voucher Type

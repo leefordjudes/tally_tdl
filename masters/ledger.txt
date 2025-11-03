@@ -1,8 +1,3 @@
-[Collection: TallyLedgers]
-	Type: Ledger
-	Title: "Tally Ledgers"
-	Format	: $Name, 40
-	
 [Report: AP Ledger Map]
 	Use: AP Unit Map
 	Title: "Auditplus Ledger Mapping"
@@ -54,9 +49,9 @@
 	
 	Variable: ApLedGroupName: String	
 
-	LIST VARIABLE 	: ApGroupMapList 		: String
-	LIST VARIABLE 	: TallyLedgerMapList 	: String
-	LIST VARIABLE 	: LedgerMapList 		: String
+;	LIST VARIABLE 	: ApGroupMapList 		: String
+;	LIST VARIABLE 	: TallyLedgerMapList 	: String
+;	LIST VARIABLE 	: LedgerMapList 		: String
 	
 	Local Formula : BBYR: $$YearOfDate:@@ApBookBegin
 	Local Formula : BBZM: $$ZeroFill:($$MonthOfDate:@@ApBookBegin):2
@@ -72,7 +67,7 @@
 	
 	00101: 	LIST FILL : LedgerMapList 	: APLedgers : $APId   : $APName	
 	00200:  LIST FILL : ApGroupMapList 	: APGroups 	: $ApName : $APTallyName
-	00210:  LIST FILL : TallyLedgerMapList : TallyLedgers : $name : $name
+	00210:  LIST FILL : TallyLedgerMapList : TallyLedgers : $name : $parent
 		 
 	00220: 	START PROGRESS	: @LedCount:"Creating Masters":"Ledgers"
 	00230:  SET: ProgressCount: 1

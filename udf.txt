@@ -1,36 +1,37 @@
 [System: UDF]
-	AP Host					: 	String		: 25001
-	AP Organization			:	String		: 25002
-	AP AuthToken			: 	String		: 25003	
+	AP Host							: String	: 25001
+	AP Organization			:	String	: 25002
+	AP AuthToken				: String	: 25003	
 	
-	AP Name					:	String		: 25004
-	AP Tally Name			:	String		: 25005
+	AP Name							:	String	: 25004
+	AP Tally Name				:	String	: 25005
 		
-	AP UQC					:	String		: 25006
-	AP Account Type			:	String		: 25007
-	AP HsnCode				: 	String		: 25008
-	AP Voucher Type			:	String		: 25009
+	AP UQC							:	String	: 25006
+	AP Account Type			:	String	: 25007
+	AP HsnCode					: String	: 25008
+	AP Voucher Type			:	String	: 25009
 	
-	Ap Gst Reg Type			:   String		: 25010
-	Ap Gst Location			:   String		: 25011
-	Ap Gst No				:   String		: 25012
-	Ap Pan No				:   String		: 25013
-	Ap Address				:   String		: 25014
-	Ap State				:   String		: 25015
-	Ap Country				:   String		: 25016
+	Ap Gst Reg Type			: String	: 25010
+	Ap Gst Location			: String	: 25011
+	Ap Gst No						: String	: 25012
+	Ap Pan No						: String	: 25013
+	Ap Address					: String	: 25014
+	Ap State						: String	: 25015
+	Ap Country					: String	: 25016
 	
 ;	AP Txn Voucher Type		: 	String		: 25010		
-;	AP Txn From Date		: 	String		: 25011
-;	AP Txn To Date			: 	String		: 25012
+	
+	Ap BookBegin				: Date		: 25001	
+	AP Txn From Date		: Date		: 25002
+	AP Txn To Date			: Date		: 25003
 
-	AP Id					: 	Number		: 25001
-	
-	Ap BookBegin			:   Date		: 25001
-	
-	Ap Is Imported			:   Logical		: 25000
+	AP Id								: Number	: 25001
 		
-	AP Units				:	Aggregate	: 25001
+	
+	Ap Is Imported			: Logical	: 25000
+		
+	AP Units						:	Aggregate	: 25001
 	AP Stock Items			:	Aggregate	: 25002
-	AP Ledgers				:	Aggregate	: 25003
+	AP Ledgers					:	Aggregate	: 25003
 	AP VoucherTypes			:	Aggregate	: 25004
-	AP Groups				:	Aggregate	: 25005
+	AP Groups						:	Aggregate	: 25005

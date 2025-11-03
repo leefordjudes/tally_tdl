@@ -21,12 +21,6 @@
 	
 	Variable: IdVar				: Number	
 	Variable: RowId				: Number
-	
-	LIST VARIABLE 	: VoucherType Map List 	: String	
-	LIST VARIABLE 	: Group Map List 		: String
-	LIST VARIABLE 	: StockItem Map List 	: String
-	LIST VARIABLE 	: Unit Map List 		: String
-	
 
 	Local Formula: Lc: $$ListCount:LedgerMapList
 	
@@ -39,7 +33,7 @@
 	00600: 	   		LIST FILL : VoucherTypeMapList 	: APVoucherTypes	: $APId 		: $APTallyName
 	00700:  	End If
 	00800:  	If: (##ApMasterDownloadTables Contains "account_type")
-	00900: 	   		LIST FILL : GroupMapList 		: APGroups 			: $APId 		: $APTallyName
+	00900: 	   		LIST FILL : ApGroupMapList 		: APGroups 			: $APId 		: $APTallyName
 	01000:  	End If
 	01100:  	If: (##ApMasterDownloadTables Contains "hsn")
 	01200: 	   		LIST FILL : StockItemMapList	: APStockItems		: $APHsnCode	: $APTallyName
@@ -80,7 +74,7 @@
 	04310:			Sleep: 1
 	04400: 			Walk Collection: account_types
 	04500:      	Show Progress:$$LoopIndex:$$Sprintf:"AccountType Name: %s":$name
-	04600: 				If: $$ListFind:GroupMapList:$$String:$id
+	04600: 				If: $$ListFind:ApGroupMapList:$$String:$id
 	04700: 					Modify Object : (Company, ##SVCurrentCompany).ApGroups[1, $APId=$id].APName : $name
 	04800: 				Else				
 	04900: 					INSERT COLLECTION OBJECT   : APGroups

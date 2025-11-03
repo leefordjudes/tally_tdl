@@ -20,7 +20,7 @@
 ;	Key Item: "Stock Item"		: T : Display	:	AP Stock Item Map
 ;	Key Item: "Unit"			: N : Display	:	AP Unit Map
 	
-	
+
 
 [Include: unit.txt]
 [Include: stock_item.txt]

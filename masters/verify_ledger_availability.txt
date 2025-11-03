@@ -1,5 +1,5 @@
-[#Menu: Auditplus Integration]
-	Add : Key Item: At Beginning : "Verify Ledger Availability"	: V : Call	:	APVerifyLedgerAvailabilityFn
+;[#Menu: Auditplus Integration]
+;	Add : Key Item: At Beginning : "Verify Ledger Availability"	: V : Call	:	APVerifyLedgerAvailabilityFn
 
 [Collection: APGroupsMapped]
 	Use			: ApGroups
@@ -18,8 +18,8 @@ In APlus account_id=20 having account_type_name='Profit & Loss', in that place u
 	Variable	: PlaceOfSupply		: String	
 
 
-	List Variable 	: TallyLedgerMapList 	: String
-	List Variable 	: ApGroupMapList 		: String
+;	List Variable 	: TallyLedgerMapList 	: String
+;	List Variable 	: ApGroupMapList 		: String
 			
 	Local Formula : BBYR: $$YearOfDate:@@ApBookBegin
 	Local Formula : BBZM: $$ZeroFill:($$MonthOfDate:@@ApBookBegin):2
@@ -29,7 +29,7 @@ In APlus account_id=20 having account_type_name='Profit & Loss', in that place u
 	Local Formula: TallyGroupName: ##ApGroupMapList[$$ListIndex:ApGroupMapList:##ApLedGroupName]
 	
 	
-	00100:  If: $$IsEmpty:@@ApBookBegin
+	00100:	If: $$IsEmpty:@@ApBookBegin
 	00200:  	Msg Box: "Missing BookBegin": "BookBegin not filled in Configuration Page"
 	00300:  	Break
 	00400:  End If
@@ -38,97 +38,102 @@ In APlus account_id=20 having account_type_name='Profit & Loss', in that place u
 	00600:  LIST FILL : TallyLedgerMapList	: TallyLedgers 	: $name	: $parent
 	00700: 	LIST FILL : ApGroupMapList 	 	: APGroupsMapped: $ApName : $APTallyName
 	
-	00800: 	Walk Collection: ApMasterDownload Data Source
-	00900: 	  Start Progress: ($$NumItems:accounts):"Verifying Ledger Availability"
+	00800:	Walk Collection: ApMasterDownload Data Source
+	00900: 		Start Progress: ($$NumItems:accounts):"Verifying Ledger Availability"
 	01000:    Walk Collection: accounts
-	01100:  	  Set: ApLedGroupName : ""
-	01200:  	  Set: PlaceOfSupply  : ""
-	01300: 	    If: $$ListFind:TallyLedgerMapList:$name
-	01400:        Show Progress:$$LoopIndex:$$Sprintf:"Ledger %s Found":$name
-	01500: 	    Else
-	01600: 	      Show Progress:$$LoopIndex:$$Sprintf:"Ledger %s Not Found, Creating Ledger...":$name
+	01010:  		If: ##IsLedgerAvailabilityVerified = Yes
+	01100:  		  Set: ApLedGroupName : ""
+	01200:  		  Set: PlaceOfSupply  : ""
+	01300:  		  Set: ApLedGroupName: $account_type_name
+	01400:	 		  If: $id != 20 And $$IsEmpty:@TallyGroupName
+	01500:  				Msg Box: "Missing Account Group Mapping": "AccountName:"+$name+"\n AccountType: "+##ApLedGroupName+" was not mapped to Tally Group.\n Kindly map it and continue."
+	01610:					Set: IsLedgerAvailabilityVerified: No
+	01700:  				Break
+	01800:	 		  End If
+	01900: 	  	  If: $$ListFind:TallyLedgerMapList:$name
+	02000:    	    Show Progress:$$LoopIndex:$$Sprintf:"Ledger %s Found":$name
+	02100: 	  	  Else
+	02200: 	  	    Show Progress:$$LoopIndex:$$Sprintf:"Ledger %s Not Found, Creating Ledger...":$name
+
+	02210:	 		  	If: $id = 20 ;; $account_type_name != "Profit & Loss"
+	02220:  					Continue
+	02230:	 		  	End If
+	02240:	  	  	Increment: MissingLedgers
+
+	02300:  		  	New Object: Ledger
+	02400:	 		  	Set Value: Name	: $name
+	02500:	 		  	Set Value: Parent	: @TallyGroupName
+		
+	02600:	 		  	If: Not $$IsEmpty:$pan_no	
+	02700:  		  		Set Value: INCOMETAXNUMBER	: $pan_no
+	02800:	 		  	Else 
+	02900:	 		  		If: Not $$IsEmpty:$gst_no
+	03000:  		  				SET VALUE: INCOMETAXNUMBER	: $$Substr:$gst_no:3:10
+	03100:	 		  		End If
+	03200:	 		  	End If					
+			
+									;; mailing details object
+	03300:	 		  	Insert Collection Object: LedMailingDetails
+	03400:	 		  	Set Value:	APPLICABLEFROM 	: 	##ApApplicableFrom 
+	03500:	 		  	Set Value: 	MailingName		:	$name
+		
+	03600:	 		  	If: Not $$IsEmpty:$address
+	03700:	 		  		Insert Collection Object: Address
+	03800:	 		  		Set Value: 	Address	:	$address
+	03900:	 		  		Set Target: ..
+	04000:	 		  	End If
+		
+	04100:	 		  	If: Not $$IsEmpty:$gst_location Or Not $$IsEmpty:$country
+	04200:	 		  		Set Value: 	Country			:	"India"
+	04300:	 		  	End If
+			
+	04400:			  	If: Not $$IsEmpty:$gst_location And $gst_location = "TamilNadu" 
+	04500: 			  		SET   	   : PlaceOfSupply  : "Tamil Nadu"
+	04600: 			  		SET VALUE  : State			: "Tamil Nadu"
+	04700:			  	End If
+	04800:			  	If: Not $$IsEmpty:$gst_location And $gst_location != "TamilNadu"
+	04900: 			  		SET        : PlaceOfSupply  : $gst_location
+	05000: 			  		SET VALUE  : State			: $gst_location	
+	05100:			  	End If
+		
+	05200:	 		  	Set Target: ..
+						
+									;; ledger gst registration details
+	05300:	 		  	Insert Collection Object: LedGstRegDetails
+	05400:	 		  	Set Value:	APPLICABLEFROM 		: 	##ApApplicableFrom 
+		
+	05500:			  	If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "COMPOSITE"
+	05600: 			  		SET VALUE  : GSTREGISTRATIONTYPE	: "Composition"
+	05700:			  	End If
+	05800:			  	If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "UNREGISTERED"
+	05900: 			  		SET VALUE  : GSTREGISTRATIONTYPE	: "Unregistered/Consumer"
+	06000:			  	End If
+	06100:			  	If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "REGULAR"
+	06200: 			  		SET VALUE  : GSTREGISTRATIONTYPE	: "Regular"
+	06300:			  	End If
+	06400:			  	If: Not $$IsEmpty:$gst_reg_type And ($gst_reg_type != "REGULAR" And $gst_reg_type = "UNREGISTERED" And $gst_reg_type = "COMPOSITE")
+	06500: 			  		Msg Box: "Unsupported Gst Registration Type Found":"Account Name: "+$name+"\nAccount Type: "+$gst_reg_type
+	06510:						Set: IsLedgerAvailabilityVerified: No
+	06600:  					Break
+	06700:			  	End If
+	06800:	 		  	If: Not $$IsEmpty:##PlaceOfSupply
+	06900:	 		  		Set Value: 	PLACEOFSUPPLY		:	##PlaceOfSupply
+	07000:	 		  	End If
+	07100:	 		  	If: Not $$IsEmpty:$gst_no
+	07200:	 		  		Set Value: 	GSTIN				:	$gst_no
+	07300:	 		  	End If
+	07400:	 		  	Set Target: ..
+							
+	07500:  		  	Create Target
 	
-	01700:  	  Set: ApLedGroupName: $account_type_name
-	01710:	 	  If: $id = 20 ;; $account_type_name != "Profit & Loss"
-	01720:  		Continue
-	01730:	 	  End If
-	01800:	    Increment: MissingLedgers
-	01900:	 	  If: $$IsEmpty:@TallyGroupName
-	02000:  		Msg Box: "Missing Account Group Mapping": "AccountName:"+$name+"\n AccountType: "+##ApLedGroupName+" was not mapped to Tally Group.\n Kindly map it and continue."
-	02100:  		Break
-	02200:	 	  End If
-	
-	02300:  	  New Object: Ledger
-	02400:	 	  Set Value: Name	: $name
-	02500:	 	  Set Value: Parent	: @TallyGroupName
-
-	02600:	 	  If: Not $$IsEmpty:$pan_no	
-	02700:  	  	Set Value: INCOMETAXNUMBER	: $pan_no
-	02800:	 	  Else 
-	02900:	 	  	If: Not $$IsEmpty:$gst_no
-	03000:  	  			SET VALUE: INCOMETAXNUMBER	: $$Substr:$gst_no:3:10
-	03100:	 	  	End If
-	03200:	 	  End If					
-	
-				  ;; mailing details object
-	03300:	 	  Insert Collection Object: LedMailingDetails
-	03400:	 	  Set Value:	APPLICABLEFROM 	: 	##ApApplicableFrom 
-	03500:	 	  Set Value: 	MailingName		:	$name
-
-	03600:	 	  If: Not $$IsEmpty:$address
-	03700:	 	  	Insert Collection Object: Address
-	03800:	 	  	Set Value: 	Address	:	$address
-	03900:	 	  	Set Target: ..
-	04000:	 	  End If
-
-	04100:	 	  If: Not $$IsEmpty:$gst_location Or Not $$IsEmpty:$country
-	04200:	 	  	Set Value: 	Country			:	"India"
-	04300:	 	  End If
-	
-	04400:		  If: Not $$IsEmpty:$gst_location And $gst_location = "TamilNadu" 
-	04500: 		  	SET   	   : PlaceOfSupply  : "Tamil Nadu"
-	04600: 		  	SET VALUE  : State			: "Tamil Nadu"
-	04700:		  End If
-	04800:		  If: Not $$IsEmpty:$gst_location And $gst_location != "TamilNadu"
-	04900: 		  	SET        : PlaceOfSupply  : $gst_location
-	05000: 		  	SET VALUE  : State			: $gst_location	
-	05100:		  End If
-
-	05200:	 	  Set Target: ..
-					
-			      ;; ledger gst registration details
-	05300:	 	  Insert Collection Object: LedGstRegDetails
-	05400:	 	  Set Value:	APPLICABLEFROM 		: 	##ApApplicableFrom 
-
-	05500:		  If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "COMPOSITE"
-	05600: 		  	SET VALUE  : GSTREGISTRATIONTYPE	: "Composition"
-	05700:		  End If
-	05800:		  If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "UNREGISTERED"
-	05900: 		  	SET VALUE  : GSTREGISTRATIONTYPE	: "Unregistered/Consumer"
-	06000:		  End If
-	06100:		  If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "REGULAR"
-	06200: 		  	SET VALUE  : GSTREGISTRATIONTYPE	: "Regular"
-	06300:		  End If
-	06400:		  If: Not $$IsEmpty:$gst_reg_type And ($gst_reg_type != "REGULAR" And $gst_reg_type = "UNREGISTERED" And $gst_reg_type = "COMPOSITE")
-	06500: 		  	Msg Box: "Unsupported Gst Registration Type Found":"Account Name: "+$name+"\nAccount Type: "+$gst_reg_type
-	06600:  		Break
-	06700:		  End If
-	06800:	 	  If: Not $$IsEmpty:##PlaceOfSupply
-	06900:	 	  	Set Value: 	PLACEOFSUPPLY		:	##PlaceOfSupply
-	07000:	 	  End If
-	07100:	 	  If: Not $$IsEmpty:$gst_no
-	07200:	 	  	Set Value: 	GSTIN				:	$gst_no
-	07300:	 	  End If
-	07400:	 	  Set Target: ..
-				  
-	07500:  	  Create Target
-
-	07600:      End If
+	07600:    	  End If
+	07610:			End If	
 	07700:	  End Walk
 	07800:    End Progress
 	07900:	End Walk
 	08000:	Set: ApMasterDownloadTables: ""
 	08100:	If: ##MissingLedgers > 0
-	08200:	 Msg Box: "New Ledgers": ##MissingLedgers
+	08200:	 	Msg Box: "New Ledgers": ##MissingLedgers
 	08300:  End if
+
 	
