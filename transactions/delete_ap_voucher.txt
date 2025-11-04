@@ -36,9 +36,7 @@
 			Max			: 250
 			Type		: Date
 			Set As		: If $$IsEmpty:#ApDelImpVchFromDate Then $$SysInfo:SystemDate Else #ApDelImpVchFromDate
-			Modifies	: TxnVchFromDate : Yes
 			Style   	: Normal Bold
-			Case    	: Lower Case			
 
 	[Line: Ap DelImpVch To Date]
 		Fields: Medium Prompt, Ap DelImpVch To Date
@@ -51,7 +49,6 @@
 			Type		: Date
 			Set As		: If $$IsEmpty:##ApDelImpVchToDate Then $$SysInfo:SystemDate Else ##ApDelImpVchToDate
 			Style   	: Normal Bold
-			Case    	: Lower Case
 		
 	[Line: Ap DelImp VchType Name]
 		Fields: Medium Prompt, AP DelImp VchTypeName

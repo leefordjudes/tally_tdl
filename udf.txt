@@ -22,8 +22,8 @@
 ;	AP Txn Voucher Type		: 	String		: 25010		
 	
 	Ap BookBegin				: Date		: 25001	
-	AP Txn From Date		: Date		: 25002
-	AP Txn To Date			: Date		: 25003
+;	AP Txn From Date		: Date		: 25002
+;	AP Txn To Date			: Date		: 25003
 
 	AP Id								: Number	: 25001
 		

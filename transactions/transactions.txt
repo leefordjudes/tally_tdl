@@ -18,22 +18,26 @@
 	Local Formula: VtypName: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##TxnVchTypeId]
 	
 	00100:  START BLOCK
-	00200:		Call: APVerifyLedgerAvailabilityFn
-	00300:  END BLOCK
-	00400:  If: ##IsLedgerAvailabilityVerified = Yes
-	00500:		Walk Collection: TallyExportVoucher Data Source
-	00600: 			START PROGRESS: ($$NumItems:data):"Import Auditplus Voucher":"Creating vouchers"
-	00700:  	 	Walk Collection: data
-	00800:				SHOW PROGRESS: $$LoopIndex
-	00900: 				call : APSaveEachVoucher				
-	01000:  	 	End Walk
-	01100: 		End Walk
-	01200: 		Call: AP Update Map
-	01300: 		Msg Box: "Result": ($$String:##CreatedVch) +" "+@VtypName+" Vouchers\n Successfully Created"
-	01400: 		If: ##SkippedVch > 0 
-	01500: 			Msg Box: "Skipped Vouchers": ##SkippedVch
-	01600: 		End If		
-	01700: 	End If		
+	00200:		Call: APVerifyLedgerAvailabilityFn	
+	00300: 		LIST FILL : Tally Ledger Map List		: TallyLedgers 					: $name				: $parent
+	00400: 		LIST FILL : Ap Group Map List 			: ApGroups 							: $ApName 		: $APTallyName
+	00500: 		LIST FILL : Stock Item Map List 		: APStockItems 					: $APHsnCode 	: $APTallyName
+	00600: 		LIST FILL : Voucher Type Map List 	: APVoucherTypesMapped 	: $APId 			: $APTallyName
+	00700:  END BLOCK
+	00800:  If: ##IsLedgerAvailabilityVerified = Yes
+	00900:		Walk Collection: TallyExportVoucher Data Source
+	01000: 			START PROGRESS: ($$NumItems:data):"Import Auditplus Voucher":"Creating vouchers"
+	01100:  	 	Walk Collection: data
+	01200:				SHOW PROGRESS: $$LoopIndex
+	01300: 				call : APSaveEachVoucher				
+	01400:  	 	End Walk
+	01500: 		End Walk
+;	01600: 		Call: AP Update Map
+	01700: 		Msg Box: "Result": ($$String:##CreatedVch) +" "+@VtypName+" Vouchers\n Successfully Created"
+	01800: 		If: ##SkippedVch > 0 
+	01900: 			Msg Box: "Skipped Vouchers": ##SkippedVch
+	02000: 		End If		
+	02100: 	End If		
 	
 
 [Function: GetPartyGstRegistrationType]
@@ -222,14 +226,6 @@
 	
 	100: Set Object: (company, ##svcurrentcompany).
 	200: Set target
-	300: Walk Collection: ApLedgers				
-	400: 	If: $$ListFind:LedgerAddList:$$String:$ApId			
-	500: 		Set Target: APLedgers[##LpIdx]
-	600: 		Set Value: ApTallyName: ##LedgerAddList[$$ListIndex:LedgerAddList:$$String:$ApId]
-	700: 		Set Target: ..			
-	800: 	End if		
-	900: 	Increment: LpIdx
-	1000: End Walk
 	1100: Set: LpIdx: 1
 	1200: Walk Collection: APStockItems
 	1300: 	If: $$ListFind:StockItemAddList:$ApHsnCode

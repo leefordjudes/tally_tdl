@@ -18,7 +18,7 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
-	On 			: Form Accept: Yes: Call: APTxnConfigurationOnSubmit
+	On 			: Form Accept: Yes: Call: APSaveVoucher
 
 [Part: AP Txn Configuration Body]
 	Line:	Ap Txn B2C Sale Daywise
@@ -59,10 +59,10 @@
 ;			YR: $$YearOfDate:$$SysInfo:SystemDate
 ;			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
 ;			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
+;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Width		: 20
 			Max			: 250
 			Type		: Date
-;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Set As		: If $$IsEmpty:##TxnVchFromDate Then $$SysInfo:SystemDate Else ##TxnVchFromDate
 			Storage		: TxnVchFromDate 
 			Modifies	: TxnVchFromDate : Yes
@@ -79,10 +79,10 @@
 ;			YR: $$YearOfDate:$$SysInfo:SystemDate
 ;			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
 ;			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
+;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Width		: 20
 			Max			: 250
 			Type		: Date
-;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Set As		: If $$IsEmpty:##TxnVchToDate Then $$SysInfo:SystemDate Else ##TxnVchToDate
 			Storage		: TxnVchToDate 
 			Modifies	: TxnVchToDate : Yes
