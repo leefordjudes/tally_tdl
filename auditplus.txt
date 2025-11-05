@@ -1,7 +1,8 @@
+[Include: udf.txt]
+
 [#Menu: Gateway of Tally]	
 	
 	Add	: Key Item	: After: @@locIndentUtilities :	"Auditplus Integration" : U	: Menu	: AuditplusIntegration
-	
 
 [Menu: Auditplus Integration]
 	
@@ -17,8 +18,32 @@
 	APAuthToken		: $ApAuthToken:Company:##SVCurrentCompany
 	APBookBegin		: $ApBookBegin:Company:##SVCurrentCompany
 	
+[System: Variables]
+	Variable : TxnVchFromDate		: Date	
+	Variable : TxnVchToDate 		: Date
+	Variable : TxnVchTypeId			: Number
+	Variable : TxnVchTypeName		: String
+	Variable : TxnAccountOnly		: Logical: Yes
+	Variable : TxnB2CSaleDaywise	: Logical: Yes
+	
+	LIST VARIABLE 	: Ledger Map List 	: String
+	LIST VARIABLE 	: Ledger Add List 	: String
+	
+	LIST VARIABLE 	: StockItem Map List 	: String
+	LIST VARIABLE 	: StockItem Add List 	: String
+	
+	LIST VARIABLE 	: Unit Map List 		: String
+	LIST VARIABLE 	: VoucherType Map List 	: String
+	LIST VARIABLE 	: Ap Group Map List 	: String
+	LIST VARIABLE 	: Tally Ledger Map List : String
 
-[Include: udf.txt]
+[Collection: TallyLedgers]
+	Type: Ledger
+	Title: "Tally Ledgers"
+	Format	: $Name, 40
+	Format	: $Parent, 40	
+
+
 [Include: company_details.txt]
 [Include: auditplus_login.txt]
 [Include: configuration/configuration.txt]

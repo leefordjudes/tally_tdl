@@ -17,159 +17,122 @@
 	100: Return: $$StringPart:##sSource:(##nStart-1):##nLen
 	
 [Function: AP Download Masters ]
-	Variable: ProgressCount		: Number		
+	Variable: ApMasterDownloadTables : String	
 	
 	Variable: IdVar				: Number	
-	Variable: LpIdx				: Number
 	Variable: RowId				: Number
-	
-	LIST VARIABLE 	: Ledger Map List 		: String
-	LIST VARIABLE 	: Group Map List 		: String
-	LIST VARIABLE 	: StockItem Map List 	: String
-	LIST VARIABLE 	: VoucherType Map List 	: String
 
 	Local Formula: Lc: $$ListCount:LedgerMapList
 	
-	100: Query Box: "Do you want to download masters" : Yes: No
-	200: If: $$LastResult			
-	300: 	START BLOCK
-	400: 		Set Object: (Company, ##SVCurrentCompany).
-	500: 		LIST FILL : LedgerMapList 		: APLedgers 		: $APId 		: $APTallyName
-	510: 		LIST FILL : GroupMapList 		: APGroups 			: $APId 		: $APTallyName
-	600: 		LIST FILL : StockItemMapList 	: APStockItems 		: $APHsnCode 	: $APTallyName
-	700: 		LIST FILL : VoucherTypeMapList 	: APVoucherTypes 	: $APId 		: $APTallyName
-	800: 	END BLOCK	
-	900: 	START PROGRESS	: 5:"Downloading":"Masters"		
-	1000: 	Walk Collection: AP Tally Export Master Data Source 			
-	1100: 		SET TARGET	: (Company, ##SVCurrentCompany).
-	1200: 		SET		: ProgressCount		: 1
+	00000:	Set: ApMasterDownloadTables: "voucher_type,account_type"
+	00100:	Query Box: "Do you want to download masters: \n"+##ApMasterDownloadTables : Yes: No
+	00200:  If: $$LastResult			
+	00300: 	 	START BLOCK
+	00400: 	   	Set Object: (Company, ##SVCurrentCompany).
+	00500:  	If: (##ApMasterDownloadTables Contains "voucher_type")
+	00600: 	   		LIST FILL : VoucherTypeMapList 	: APVoucherTypes	: $APId 		: $APTallyName
+	00700:  	End If
+	00800:  	If: (##ApMasterDownloadTables Contains "account_type")
+	00900: 	   		LIST FILL : ApGroupMapList 		: APGroups 			: $APId 		: $APTallyName
+	01000:  	End If
+	01100:  	If: (##ApMasterDownloadTables Contains "hsn")
+	01200: 	   		LIST FILL : StockItemMapList	: APStockItems		: $APHsnCode	: $APTallyName
+	01300:  	End If
+	01400:  	If: (##ApMasterDownloadTables Contains "unit")
+	01500: 	   		LIST FILL : UnitMapList			: APUnits			: $APId			: $APTallyName
+	01600:  	End If
+	01700: 	 	END BLOCK
+
+	01800: 	 	Walk Collection: ApMasterDownload Data Source
+	01900: 			SET TARGET	: (Company, ##SVCurrentCompany).		
 	
-	1300: 		Set: LpIdx: 1		
-	1400: 		Walk Collection: accounts
-	1500: 			If: $$ListFind:LedgerMapList:$$String:$id
-	1600: 				Modify Object : (Company, ##SVCurrentCompany).ApLedgers[1, $APId=$id].APName : $name, ApTallyName : $name
-	1700: 			Else				
-	1800: 				INSERT COLLECTION OBJECT   : APLedgers
-	1900: 				SET VALUE  : APId   		: $id
-	2000: 				SET VALUE  : APName 		: $name
-	2100: 				SET VALUE  : APAccountType	: $account_type_name
-	2200: 				SET VALUE  : APTallyName  	: $name
-
-	2201:				If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "UNREGISTERED"
-	2202: 					SET VALUE  : APGstRegType	: "Unregistered/Consumer"
-	2203:				End If
-	2204:				If: Not $$IsEmpty:$gst_reg_type And $gst_reg_type = "REGULAR"
-	2205: 					SET VALUE  : APGstRegType	: "Regular"
-	2206:				End If
-	2207:				If: Not $$IsEmpty:$gst_no
-	2208: 					SET VALUE  : APGstNo		: $gst_no
-	2209:				End If
-	2210:				If: $$IsEmpty:$pan_no And Not $$IsEmpty:$gst_no
-	2211: 					SET VALUE  : APPanNo	: $$Substr:$gst_no:3:10
-	2212:				End If
-	2213:				If: Not $$IsEmpty:$address
-	2214: 					SET VALUE  : APAddress		: $address
-	2215:				End If
-	2216:				If: Not $$IsEmpty:$gst_location Or Not $$IsEmpty:$country
-	2217: 					SET VALUE  : APCountry		: "India"
-	2218:				End If
-	  
-	2219:				If: Not $$IsEmpty:$gst_location And $gst_location = "TamilNadu" 
-	2220: 					SET VALUE  : APGstLocation	: "Tamil Nadu"
-	2221: 					SET VALUE  : APState		: "Tamil Nadu"
-	2222:				End If
-	2223:				If: Not $$IsEmpty:$gst_location And $gst_location != "TamilNadu"
-	2224: 					SET VALUE  : APGstLocation	: $gst_location
-	2225: 					SET VALUE  : APState		: $gst_location	
-	2226:				End If
+	02000:  	If: (##ApMasterDownloadTables Contains "voucher_type")
+	02100:			Start Batch Post: 100
+	02300: 			Start Progress	: ($$NumItems:voucher_types):"Downloading Auditplus Voucher Types"
+	02310:			Sleep: 1
+	02400: 			Walk Collection: voucher_types
+	02500:      	Show Progress:$$LoopIndex:$$Sprintf:"VoucherType Name: %s":$name
+	02600: 				If: $$ListFind:VoucherTypeMapList:$$String:$id
+	02700: 					Modify Object : (Company, ##SVCurrentCompany).ApVoucherTypes[1, $APId=$id].APName : $name
+	02800: 				Else
+	02900: 					INSERT COLLECTION OBJECT   : APVoucherTypes
+	03000: 					SET VALUE  : APId   		: $id
+	03100: 					SET VALUE  : APName 		: $name
+	03200: 					SET VALUE  : APVoucherType	: $base_type
+	03300: 					RESET VALUE  : APTallyName ;; 	: $$SysName:NotApplicable
+	03400: 					Set Target: .. 
+	03500: 				End If	
+	03600: 			End Walk		
+	03700: 			End Progress	
+	03800: 			Alter Target
+	03900: 			End Batch Post
+	04000:  	End If
 	
-	2300: 				Set Target: .. 				
-	2400: 			End If							
-	2500: 			Increment: LpIdx
-	2600: 		End Walk			
-
-	2700: 		SHOW PROGRESS	: ##ProgressCount
-	2800: 		INCREMENT		: ProgressCount			
-
-	2900: 		Set: LpIdx: 1	
-	3000: 		Walk Collection: hsns
-	3100: 			If: $$ListFind:StockItemMapList:$hsn_code
-	3200: 				Modify Object : (Company, ##SVCurrentCompany).ApStockItems[1, $APHsnCode=$hsn_code].APName : $name
-	3300: 			Else	
-	3400: 				INSERT COLLECTION OBJECT   : APStockItems
-	3500: 				SET VALUE  : APHsnCode 	: $hsn_code
-	3600: 				SET VALUE  : APName		: $name
-	3700: 				RESET VALUE  : APTallyName  ;; 	: $$SysName:NotApplicable
-	3800: 				Set Target: .. 	
-	3900: 			End If	
-	4000: 			Increment: LpIdx
-	4100: 		End Walk		
+	04100:  	If: (##ApMasterDownloadTables Contains "account_type")
+	04200:			Start Batch Post: 100
+	04300: 			Start Progress	: ($$NumItems:account_types):"Downloading Auditplus Account Types"
+	04310:			Sleep: 1
+	04400: 			Walk Collection: account_types
+	04500:      	Show Progress:$$LoopIndex:$$Sprintf:"AccountType Name: %s":$name
+	04600: 				If: $$ListFind:ApGroupMapList:$$String:$id
+	04700: 					Modify Object : (Company, ##SVCurrentCompany).ApGroups[1, $APId=$id].APName : $name
+	04800: 				Else				
+	04900: 					INSERT COLLECTION OBJECT   : APGroups
+	05000: 					SET VALUE  : APId   		: $id
+	05100: 					SET VALUE  : APName 		: $name
+	05200: 					SET VALUE  : APAccountType	: $base_types
+	05300: 					RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	05400: 					Set Target: .. 				
+	05500: 				End If							
+	05600: 			End Walk
+	05700: 			End Progress		
+	05800: 			Alter Target
+	05900: 			End Batch Post
+	06000:  	End If
 	
-	4200: 		SHOW PROGRESS	: ##ProgressCount
-	4300: 		INCREMENT		: ProgressCount			
-			
-;	4400: 		Set: LpIdx: 1
-;	4500: 		Walk Collection: units
-;	4600: 			INSERT COLLECTION OBJECT   : APUnits
-;	4700: 			SET VALUE  : APId   : $id
-;	4800: 			SET VALUE  : APName : $name
-;	4900: 			SET VALUE  : APUqc  : $uqc	
-;	5000: 			RESET VALUE  : APTallyName ;; : $$SysName:NotApplicable
-;	5100: 			Set Target: .. 
-;	5200: 			Increment: LpIdx
-;	5300: 		End Walk				
+	06100:  	If: (##ApMasterDownloadTables Contains "hsn")
+	06200:			Start Batch Post: 100
+	06300: 			Start Progress	: ($$NumItems:hsns):"Downloading Auditplus Stock Items"
+	06310:			Sleep: 1
+	06400: 			Walk Collection: hsns
+	06500:      	Show Progress:$$LoopIndex:$$Sprintf:"StockItem Name: %s":$name
+	06600: 				If: $$ListFind:StockItemMapList:$hsn_code
+	06700: 					Modify Object : (Company, ##SVCurrentCompany).ApStockItems[1, $APHsnCode=$hsn_code].APName : $name
+	06800: 				Else				
+	06900: 					INSERT COLLECTION OBJECT   : APStockItems
+	07000: 					SET VALUE  : APHsnCode 		: $hsn_code
+	07100: 					SET VALUE  : APName 		: $name
+	07200: 					RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	07400: 					Set Target: .. 				
+	07500: 				End If							
+	07600: 			End Walk
+	07700: 			End Progress		
+	07800: 			Alter Target
+	07900: 			End Batch Post
+	08000:  	End If
 
-;	5400: 		SHOW PROGRESS	: ##ProgressCount
-;	5500: 		INCREMENT		: ProgressCount			
+	08100:  	If: (##ApMasterDownloadTables Contains "unit")
+	08200:			Start Batch Post: 100
+	08300: 			Start Progress	: ($$NumItems:hsns):"Downloading Auditplus Units"
+	08310:			Sleep: 1
+	08400: 			Walk Collection: units
+	08500:      	Show Progress:$$LoopIndex:$$Sprintf:"Unit Name: %s":$name
+	08600: 				If: $$ListFind:UnitMapList:$$String:$id
+	08700: 					Modify Object : (Company, ##SVCurrentCompany).ApStockItems[1, $APId=$id].APName : $name, ApUqc : $uqc
+	08800: 				Else				
+	08900: 					INSERT COLLECTION OBJECT   : APUnits
+	09000: 					SET VALUE  : APId 			: $id
+	09100: 					SET VALUE  : APName 		: $name
+	09200: 					SET VALUE  : APUqc 			: $uqc
+	09300: 					RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
+	09400: 					Set Target: .. 				
+	09500: 				End If							
+	09600: 			End Walk
+	09700: 			End Progress		
+	09800: 			Alter Target
+	09900: 			End Batch Post
+	10000:  	End If
 	
-	5600: 		Set: LpIdx: 1
-	5700: 		Walk Collection: voucher_types
-	5800: 			If: $$ListFind:VoucherTypeMapList:$$String:$id
-	5900: 				Modify Object : (Company, ##SVCurrentCompany).ApVoucherTypes[1, $APId=$id].APName : $name
-	6000: 			Else
-	6100: 				INSERT COLLECTION OBJECT   : APVoucherTypes
-	6200: 				SET VALUE  : APId   		: $id
-	6300: 				SET VALUE  : APName 		: $name
-	6400: 				SET VALUE  : APVoucherType	: $base_type
-	6500: 				RESET VALUE  : APTallyName ;; 	: $$SysName:NotApplicable
-	6600: 				Set Target: .. 
-	6700: 			End If	
-	6800: 			Increment: LpIdx
-	6900: 		End Walk				
-	
-	7000: 		SHOW PROGRESS	: ##ProgressCount
-	7100: 		INCREMENT		: ProgressCount		
-	
-	7200: 		Set: LpIdx: 1		
-	7300: 		Walk Collection: account_types
-	7400: 			If: $$ListFind:GroupMapList:$$String:$id
-	7500: 				Modify Object : (Company, ##SVCurrentCompany).ApGroups[1, $APId=$id].APName : $name
-	7600: 			Else				
-	7700: 				INSERT COLLECTION OBJECT   : APGroups
-	7800: 				SET VALUE  : APId   		: $id
-	7900: 				SET VALUE  : APName 		: $name
-	7910: 				SET VALUE  : APAccountType	: $base_types
-	8000: 				RESET VALUE  : APTallyName  	;; : $$SysName:NotApplicable
-	8100: 				Set Target: .. 				
-	8200: 			End If							
-	8300: 			Increment: LpIdx
-	8400: 		End Walk
-	
-	8500: 		SHOW PROGRESS	: ##ProgressCount
-	8600: 		INCREMENT		: ProgressCount		
-	
-	8700: 		Alter Target
-	8800: 		END PROGRESS
-	8900: 	End Walk		
-	9000:End If
-
-
-
-		
-
-
-
-
-
-
+	10100: 		End Walk		
+	10200:	End If
 

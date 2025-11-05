@@ -1,24 +1,26 @@
 [Menu: AP Masters]
 	Title	: "Masters (Auditplus To Tally)"
-	Key Item: "Download"		: D : Call		:	AP Download Masters
+	Key Item: "Download"		: D : Call		:	APDownloadMasters
 	Item: Blank	
 	
 	Indent	: "Mappings"
-	Key Item: "Ledger"			: L : Alter		:	AP Ledger Map
-	Key Item: "Ledgers Create"	: C : Call		:	AP Ledger Create Fn
-	Key Item: "Group"			: G : Alter		:	AP Group Map
-	Key Item: "Stock Item"		: S : Alter		:	AP Stock Item Map
-	Key Item: "Unit"			: U : Alter		:	AP Unit Map	
+	Key Item: "Group"			: G : Alter		:	AP Group Map	
 	Key Item: "VoucherType"		: V : Alter		:	AP VoucherType Map	
+;	Key Item: "Ledgers Create"	: C : Call		:	AP Ledger Create Fn
+;	Key Item: "Ledger"			: L : Alter		:	AP Ledger Map		
+;	Key Item: "Stock Item"		: S : Alter		:	AP Stock Item Map
+;	Key Item: "Unit"			: U : Alter		:	AP Unit Map	
+	
 	Item: Blank
 
 	Indent	: "Reports"
-	Key Item: "Ledger"			: E : Display	:	AP Ledger Map	
-	Key Item: "Group"			: R : Display	:	AP Group Map
-	Key Item: "Stock Item"		: I : Display	:	AP Stock Item Map
-	Key Item: "Unit"			: N : Display	:	AP Unit Map
-	Key Item: "Voucher Type"	: T : Display	:	AP VoucherType Map
+	Key Item: "Group"			: R : Display	:	AP Group Map	
+	Key Item: "Voucher Type"	: O : Display	:	AP VoucherType Map	
+;	Key Item: "Ledger"			: E : Display	:	AP Ledger Map		
+;	Key Item: "Stock Item"		: T : Display	:	AP Stock Item Map
+;	Key Item: "Unit"			: N : Display	:	AP Unit Map
 	
+
 
 [Include: unit.txt]
 [Include: stock_item.txt]
@@ -26,3 +28,5 @@
 [Include: group.txt]
 [Include: voucher_type.txt]
 [Include: download.txt]
+[Include: verify_ledger_availability.txt]
+[Include: ap_master_download.txt]

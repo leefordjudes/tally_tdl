@@ -1,8 +1,10 @@
 [Function: AP Txn Configuration On Submit]
-	100: LIST FILL : Ledger Map List : APLedgers : ($$String:$APId) : $APTallyName
-	200: LIST FILL : StockItem Map List : APStockItems : $APHsnCode : $APTallyName
-	300: LIST FILL : VoucherType Map List : APVoucherTypesMapped : $APId : $APTallyName	
-	400: Call: APSaveVoucher
+;	100: LIST FILL : Ledger Map List : APLedgers : ($$String:$APId) : $APTallyName
+	100: LIST FILL : Tally Ledger Map List	: TallyLedgers 					: $name				: $parent
+	200: LIST FILL : Ap Group Map List 			: ApGroups 							: $ApName 		: $APTallyName
+	300: LIST FILL : Stock Item Map List 		: APStockItems 					: $APHsnCode 	: $APTallyName
+	400: LIST FILL : Voucher Type Map List 	: APVoucherTypesMapped 	: $APId 			: $APTallyName	
+	500: Call: APSaveVoucher
 
 [Report: AP Txn Configuration]
 	Title	: 	Transaction Configuration
@@ -16,7 +18,7 @@
 	Space Left	: 2
 	Space Right	: 2
 	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Transaction Configuration"
-	On 			: Form Accept: Yes: Call: APTxnConfigurationOnSubmit
+	On 			: Form Accept: Yes: Call: APSaveVoucher
 
 [Part: AP Txn Configuration Body]
 	Line:	Ap Txn B2C Sale Daywise
@@ -34,7 +36,8 @@
 			Type		: Logical
 			Use         : Logical Field
 			Modifies    : Txn B2C Sale Daywise : Yes
-			Set As		: If $$IsEmpty:##TxnB2CSaleDaywise Then No else ##TxnB2CSaleDaywise
+			Info  		: Yes ;If $$IsEmpty:##TxnB2CSaleDaywise Then No else ##TxnB2CSaleDaywise
+			
 
 	[Line:	Ap Txn Account Only]
 		Fields:	Medium Prompt, Ap Txn Account Only
@@ -45,7 +48,7 @@
 			Type		: Logical
 			Use         : Logical Field
 			Modifies    : Txn Account Only : Yes
-			Set As		: If $$IsEmpty:##TxnAccountOnly Then No else ##TxnAccountOnly
+			Info		: Yes ;If $$IsEmpty:##TxnAccountOnly Then No else ##TxnAccountOnly
 			
 	[Line: AP Txn From Date]
 		Fields: Medium Prompt, AP Txn From Date
@@ -56,14 +59,15 @@
 ;			YR: $$YearOfDate:$$SysInfo:SystemDate
 ;			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
 ;			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
+;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Width		: 20
 			Max			: 250
 			Type		: Date
-;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Set As		: If $$IsEmpty:##TxnVchFromDate Then $$SysInfo:SystemDate Else ##TxnVchFromDate
+			Storage		: TxnVchFromDate 
 			Modifies	: TxnVchFromDate : Yes
 			Style   	: Normal Bold
-			Case    	: Lower Case
+			Tooltip		: "Date datatype, Download Transaction from 'From Date'"
 			
 
 	[Line: Ap Txn To Date]
@@ -75,14 +79,16 @@
 ;			YR: $$YearOfDate:$$SysInfo:SystemDate
 ;			ZM: $$ZeroFill:($$MonthOfDate:$$SysInfo:SystemDate):2
 ;			ZD: $$ZeroFill:($$DayofDate:$$SysInfo:SystemDate):2
+;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Width		: 20
 			Max			: 250
 			Type		: Date
-;			Set as		: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
 			Set As		: If $$IsEmpty:##TxnVchToDate Then $$SysInfo:SystemDate Else ##TxnVchToDate
+			Storage		: TxnVchToDate 
 			Modifies	: TxnVchToDate : Yes
 			Style   	: Normal Bold
-			Case    	: Lower Case
+			Tooltip		: "Date datatype, Download Transaction upto 'To Date'"
+			
 		
 	[Line: Ap Txn Voucher Type]
 		Fields: Medium Prompt, AP Txn Voucher Type

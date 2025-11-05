@@ -1,0 +1,53 @@
+;[#Menu: AP Masters]
+;	Add : Key Item: At Beginning : "Test Master Download"	: D : Call	:	ApMasterDownloadFn
+	
+[Function: ApMasterDownloadFn]
+	Variable: ApMasterDownloadTables: String
+	
+001: Set: ApMasterDownloadTables: "account_type"
+010: Walk Collection: ApMasterDownload Data Source
+020:   Walk Collection: account_types
+030:     Msg Box: "Account Type Name": $name
+040:   End Walk	
+050:   Set: ApMasterDownloadTables: ""
+060: End Walk	
+
+[Collection: ApMasterDownload Data Source]
+	Data Source		: HTTP JSON: @@APHost: UTF8
+	JSON Object Path: "data:1"
+	RemoteRequest	: ApMasterDownload Request: UTF8
+	Export Header	: "organization:" + @@APOrganization
+	Export Header	: "auth_token:" + @@APAuthToken	
+;;----------------------------RPC Request Start---------------------	
+[Report: ApMasterDownload Request]
+	Form: ApMasterDownload Request
+	Plain JSON: Yes
+		
+[Form: ApMasterDownload Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: ApMasterDownload Request
+	
+[Part: ApMasterDownload Request]
+	Line: ApMasterDownload Method
+	Line: ApMasterDownload Data
+	Scroll: Vertical
+	
+	[Line: ApMasterDownload Method]
+		Field: ApMasterDownload Method
+			
+			[Field: ApMasterDownload Method]
+				Use: Name Field
+				JSONTag: "method"
+				Set as: "tally_export_master"
+				
+	[Line: ApMasterDownload Data]
+		Field: ApMasterDownload Data
+			
+			[Field: ApMasterDownload Data]
+				Use: Name Field
+				JSONTag: "data"
+				Set as: ##ApMasterDownloadTables
+					
+;;----------------------------RPC Request End---------------------	
