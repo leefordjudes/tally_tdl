@@ -143,12 +143,12 @@
 	05700:		End If
 	05800: 		Set: TallyNameVar: If $account_id != 20 Then $account_name Else "Profit & Loss A/c"
 	05900: 		Set: ApGroupNameVar: If $account_id != 20 Then $account_type_name Else "Primary" 
-	06000: 		If: $account_id != 20 And @TallyAccGroupName != @ApGroupMappedName
-	06100:			Msg Box: "Mismatch Group Map" : "Tally ledger group & auditplus group map - Mismatched"
-	06200:  	 	Increment: SkippedVch
-	06300:  	 	Set: CreateVch: No
-	06400:			Break
-	06500:		End If		
+;	06000: 		If: $account_id != 20 And @TallyAccGroupName != @ApGroupMappedName
+;	06100:			Msg Box: "Mismatch Group Map" : "Tally ledger group & auditplus group map - Mismatched"
+;	06200:  	 	Increment: SkippedVch
+;	06300:  	 	Set: CreateVch: No
+;	06400:			Break
+;	06500:		End If		
 	06600: 		Set: HsnCodeVar: $hsn_code
 	06700: 		If: $$IsEmpty:##HsnCodeVar		
 	06800: 			INSERT COLLECTION OBJECT 				: LEDGERENTRIES
