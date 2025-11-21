@@ -35,7 +35,8 @@
 			Width		: 20
 			Max			: 250
 			Type		: Date
-			Set As		: If $$IsEmpty:#ApDelImpVchFromDate Then $$SysInfo:SystemDate Else #ApDelImpVchFromDate
+			Modifies: ApDelImpVchFromDate :Yes
+			Set As		: If $$IsEmpty:##ApDelImpVchFromDate Then $$SysInfo:SystemDate Else ##ApDelImpVchFromDate
 			Style   	: Normal Bold
 
 	[Line: Ap DelImpVch To Date]
@@ -47,6 +48,7 @@
 			Width		: 20
 			Max			: 250
 			Type		: Date
+			Modifies: ApDelImpVchToDate :Yes
 			Set As		: If $$IsEmpty:##ApDelImpVchToDate Then $$SysInfo:SystemDate Else ##ApDelImpVchToDate
 			Style   	: Normal Bold
 		
@@ -59,6 +61,9 @@
 			Width		: 20
 			Max			: 250
 			Style   	: Normal Bold
+			Type			: String
+			Modifies	: ApDelImpVchTypeName : Yes
+			Set As		: If $$IsEmpty:##ApDelImpVchTypeName Then "" Else ##ApDelImpVchTypeName
 			Show Table	: Always
 			Table		: APVoucherTypeNamesMapped
 			Tooltip		: "Mapped voucher Type Names"
@@ -79,7 +84,7 @@
 	
 [Function: ApDeleteVouchersFn]
 	Parameter: ApDeleteVoucherFromDate	: Date 
-	Parameter: ApDeleteVoucherToDate	: Date 
+	Parameter: ApDeleteVoucherToDate		: Date 
 	Parameter: ApDeleteVoucherTypeName	: String
 	
 	0100: If:Not $$IsEmpty:($$NumItems:ApDeleteVouchersColl)

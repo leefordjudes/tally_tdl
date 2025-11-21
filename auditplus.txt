@@ -25,6 +25,9 @@
 	Variable : TxnVchTypeName		: String
 	Variable : TxnAccountOnly		: Logical: Yes
 	Variable : TxnB2CSaleDaywise	: Logical: Yes
+	Variable : APDelImpVchFromDate	: Date
+	Variable : APDelImpVchToDate		: Date
+	Variable : ApDelImpVchTypeName	: String
 	
 	LIST VARIABLE 	: Ledger Map List 	: String
 	LIST VARIABLE 	: Ledger Add List 	: String

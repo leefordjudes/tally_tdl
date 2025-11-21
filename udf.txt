@@ -19,11 +19,9 @@
 	Ap State						: String	: 25015
 	Ap Country					: String	: 25016
 	
-;	AP Txn Voucher Type		: 	String		: 25010		
-	
+
 	Ap BookBegin				: Date		: 25001	
-;	AP Txn From Date		: Date		: 25002
-;	AP Txn To Date			: Date		: 25003
+
 
 	AP Id								: Number	: 25001
 		
@@ -35,3 +33,4 @@
 	AP Ledgers					:	Aggregate	: 25003
 	AP VoucherTypes			:	Aggregate	: 25004
 	AP Groups						:	Aggregate	: 25005
+	
