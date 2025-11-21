@@ -35,7 +35,6 @@
 			Width		: 20
 			Max			: 250
 			Type		: Date
-;			Storage	: ApDelImpVchFromDate
 			Modifies: ApDelImpVchFromDate :Yes
 			Set As		: If $$IsEmpty:##ApDelImpVchFromDate Then $$SysInfo:SystemDate Else ##ApDelImpVchFromDate
 			Style   	: Normal Bold
@@ -49,7 +48,6 @@
 			Width		: 20
 			Max			: 250
 			Type		: Date
-;			Storage	: ApDelImpVchToDate
 			Modifies: ApDelImpVchToDate :Yes
 			Set As		: If $$IsEmpty:##ApDelImpVchToDate Then $$SysInfo:SystemDate Else ##ApDelImpVchToDate
 			Style   	: Normal Bold
@@ -64,7 +62,6 @@
 			Max			: 250
 			Style   	: Normal Bold
 			Type			: String
-;			Storage		: ApDelImpVchTypeName
 			Modifies	: ApDelImpVchTypeName : Yes
 			Set As		: If $$IsEmpty:##ApDelImpVchTypeName Then "" Else ##ApDelImpVchTypeName
 			Show Table	: Always
